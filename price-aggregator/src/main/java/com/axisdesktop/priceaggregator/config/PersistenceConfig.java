@@ -1,5 +1,7 @@
 package com.axisdesktop.priceaggregator.config;
 
+import java.util.Properties;
+
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -33,7 +35,8 @@ public class PersistenceConfig {
 	public DataSource dataSource() {
 		DataSource dataSource = null;
 
-		if( environment.getRequiredProperty( "db.source.type" ) == "jndi" ) {
+		if( environment.getRequiredProperty( "db.source.type" ).equals( "jndi" ) ) {
+
 			String dsn = environment.getRequiredProperty( "db.jndi" );
 			JndiTemplate jndi = new JndiTemplate();
 
@@ -70,21 +73,22 @@ public class PersistenceConfig {
 		factory.setPackagesToScan( "com.axisdesktop.priceaggregator.entity" );
 		factory.setDataSource( dataSource() );
 
-		// Properties jpaProperties = new Properties();
+		Properties jpaProperties = new Properties();
+		// jpaProperties.put( "hibernate.connection.zeroDateTimeBehavior",
+		// environment.getProperty( "hibernate.connection.zeroDateTimeBehavior"
+		// ) );
+		jpaProperties.put( "hibernate.format_sql", environment.getProperty( "hibernate.format_sql" ) );
+
 		// jpaProperties.put( "hibernate.hbm2ddl.auto", environment.getProperty(
 		// "hibernate.hbm2ddl.auto" ) );
-		// factory.setJpaProperties( jpaProperties );
+		// jpaProperties.put( "hibernate.dialect", environment.getProperty(
+		// "hibernate.dialect" ) );
+		factory.setJpaProperties( jpaProperties );
 		// factory.afterPropertiesSet();
 		// factory.setLoadTimeWeaver( new InstrumentationLoadTimeWeaver() );
 
 		return factory;
 	}
-
-	// @Bean
-	// public PlatformTransactionManager transactionManager() {
-	// EntityManagerFactory factory = entityManagerFactory().getObject();
-	// return new JpaTransactionManager( factory );
-	// }
 
 	@Bean
 	public JpaTransactionManager transactionManager() {

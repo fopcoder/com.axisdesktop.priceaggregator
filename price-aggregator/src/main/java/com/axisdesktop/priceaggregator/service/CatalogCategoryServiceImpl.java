@@ -1,8 +1,13 @@
 package com.axisdesktop.priceaggregator.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.axisdesktop.priceaggregator.entity.CatalogCategory;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryRepository;
 
 @Service
@@ -25,12 +30,11 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	// return null;
 	// }
 	//
-	// @Override
+	@Override
 	// @Transactional
-	// public List<CatalogCategory> findAll() {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+	public List<CatalogCategory> findAll() {
+		return catalogCategoryRepository.findAll();
+	}
 	//
 	// @Override
 	// @Transactional

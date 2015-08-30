@@ -1,9 +1,17 @@
 package com.axisdesktop.priceaggregator.entity;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -17,10 +25,23 @@ public class CatalogCategory {
 	private String name;
 
 	@Column( nullable = false )
+	private String path;
+
+	@Column( nullable = false )
 	private int idx_left;
 
 	@Column( nullable = false )
 	private int idx_right;
+
+	@Column( updatable = false, insertable = false )
+	private Date created;
+
+	@Column
+	private Date modified;
+
+	@ManyToMany( fetch = FetchType.LAZY )
+	@JoinTable( name = "catalog_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
+	private List<CatalogCategoryItem> items = new ArrayList<>();
 
 	public int getId() {
 		return id;
@@ -52,6 +73,38 @@ public class CatalogCategory {
 
 	public void setIdx_right( int idx_right ) {
 		this.idx_right = idx_right;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath( String path ) {
+		this.path = path;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated( Date created ) {
+		this.created = created;
+	}
+
+	public Date getModified() {
+		return modified;
+	}
+
+	public void setModified( Date modified ) {
+		this.modified = modified;
+	}
+
+	public List<CatalogCategoryItem> getItems() {
+		return items;
+	}
+
+	public void setItems( List<CatalogCategoryItem> items ) {
+		this.items = items;
 	}
 
 }
