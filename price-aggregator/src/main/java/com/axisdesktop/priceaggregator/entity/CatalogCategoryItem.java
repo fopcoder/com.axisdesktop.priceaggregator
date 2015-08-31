@@ -34,6 +34,9 @@ public class CatalogCategoryItem {
 	@ManyToMany( mappedBy = "items", fetch = FetchType.LAZY )
 	private List<CatalogCategory> categories;
 
+	@Column( nullable = false, precision = 10, scale = 2 )
+	private double price;
+
 	public int getId() {
 		return id;
 	}
