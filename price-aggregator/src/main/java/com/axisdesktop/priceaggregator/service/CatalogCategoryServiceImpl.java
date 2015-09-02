@@ -16,38 +16,42 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Autowired
 	private CatalogCategoryRepository catalogCategoryRepository;
 
-	// @Override
-	// @Transactional
-	// public CatalogCategory create( CatalogCategory category ) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// @Transactional
-	// public CatalogCategory delete( int id ) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
 	@Override
-	// @Transactional
-	public List<CatalogCategory> findAll() {
+	public List<CatalogCategory> list() {
 		return catalogCategoryRepository.findAll();
 	}
-	//
-	// @Override
-	// @Transactional
-	// public CatalogCategory update( CatalogCategory category ) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// @Transactional
-	// public CatalogCategory findById( int id ) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+
+	@Override
+	@Transactional
+	public CatalogCategory create( CatalogCategory category ) {
+		return catalogCategoryRepository.save( category );
+	}
+
+	@Override
+	public CatalogCategory read( int id ) {
+		return catalogCategoryRepository.findOne( id );
+	}
+
+	@Override
+	@Transactional
+	public CatalogCategory update( CatalogCategory category ) {
+		if( catalogCategoryRepository.exists( category.getId() ) ) {
+			return catalogCategoryRepository.save( category );
+		}
+
+		return null;
+	}
+
+	@Override
+	@Transactional
+	public CatalogCategory delete( int id ) {
+		CatalogCategory category = catalogCategoryRepository.findOne( id );
+
+		if( category != null ) {
+			catalogCategoryRepository.delete( category );
+		}
+
+		return null;
+	}
 
 }

@@ -15,7 +15,7 @@ public class IndexController {
 
 	@RequestMapping( "/" )
 	public String index( Model model ) {
-		model.addAttribute( "categoryList", catalogCategoryService.findAll() );
+		model.addAttribute( "categories", catalogCategoryService.list() );
 		return "index";
 	}
 }

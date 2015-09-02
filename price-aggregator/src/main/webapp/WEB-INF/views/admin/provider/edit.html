@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta th:replace="include/meta" />
+</head>
+<body>
+	<div class="container">
+
+		<h1 class="page-header">Admin Provider Edit</h1>
+
+		<form th:action="@{/admin/provider/update}" method="POST" th:object="${provider}">
+			<input type="hidden" name="id" th:field="*{id}" />
+			<input type="text" name="name" th:field="*{name}" /><br />
+			<textarea name="contact" th:field="*{contact}"></textarea><br />
+			<button type="submit">update</button>
+		</form>
+
+	</div>
+</body>
+</html>
+
