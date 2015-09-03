@@ -14,7 +14,7 @@ import com.axisdesktop.priceaggregator.repository.ProviderRepository;
 public class ProviderServiceImpl implements ProviderService {
 
 	@Autowired
-	ProviderRepository providerRepository;
+	private ProviderRepository providerRepository;
 
 	@Override
 	public List<Provider> list() {

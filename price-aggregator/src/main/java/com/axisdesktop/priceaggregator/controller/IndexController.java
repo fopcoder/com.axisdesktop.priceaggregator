@@ -11,7 +11,7 @@ import com.axisdesktop.priceaggregator.service.CatalogCategoryService;
 public class IndexController {
 
 	@Autowired
-	CatalogCategoryService catalogCategoryService;
+	private CatalogCategoryService catalogCategoryService;
 
 	@RequestMapping( "/" )
 	public String index( Model model ) {

@@ -35,6 +35,20 @@
 				<button type="submit">create</button>
 			</fieldset>
 		</form>
+		
+		<form th:action="@{/admin/currency/create}" method="POST">
+			<fieldset>
+				<legend>Валюты</legend>
+				<div th:each="cur : ${currencies}">
+					<a th:href="@{/admin/currency/update/}+${cat.id}" th:text="${cur.name}"></a> | 
+					<a th:href="@{/admin/currency/delete/}+${cat.id}">удалить</a>
+				</div>
+
+				<input type="text" name="name" /><br />
+				
+				<button type="submit">create</button>
+			</fieldset>
+		</form>
 
 	</div>
 </body>
