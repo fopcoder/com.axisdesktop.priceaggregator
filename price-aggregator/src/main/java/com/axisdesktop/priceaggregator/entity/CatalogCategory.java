@@ -1,7 +1,7 @@
 package com.axisdesktop.priceaggregator.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,7 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table( name = "catalog_category" )
@@ -24,24 +28,46 @@ public class CatalogCategory {
 	@Column( nullable = false )
 	private String name;
 
-	@Column( nullable = false )
+	// @Column( nullable = false )
 	private String path;
 
-	@Column( nullable = false )
+	// @Column( nullable = false )
 	private int idx_left;
 
-	@Column( nullable = false )
+	// @Column( nullable = false )
 	private int idx_right;
 
-	@Column( updatable = false, insertable = false )
-	private Date created;
+	@Column( updatable = false )
+	@Temporal( TemporalType.TIMESTAMP )
+	private Calendar created;
 
-	@Column
-	private Date modified;
+	@Temporal( TemporalType.TIMESTAMP )
+	private Calendar modified;
+
+	@Column( name = "meta_title" )
+	private String metaTitle;
+
+	@Column( name = "meta_keywords" )
+	private String metaKeywords;
+
+	@Column( name = "meta_description" )
+	private String metaDescription;
+
+	private String description;
 
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
 	private List<CatalogCategoryItem> items = new ArrayList<>();
+
+	@PrePersist
+	public void prePersist() {
+		this.created = this.modified = Calendar.getInstance();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		this.modified = Calendar.getInstance();
+	}
 
 	public int getId() {
 		return id;
@@ -83,19 +109,19 @@ public class CatalogCategory {
 		this.path = path;
 	}
 
-	public Date getCreated() {
+	public Calendar getCreated() {
 		return created;
 	}
 
-	public void setCreated( Date created ) {
+	public void setCreated( Calendar created ) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public Calendar getModified() {
 		return modified;
 	}
 
-	public void setModified( Date modified ) {
+	public void setModified( Calendar modified ) {
 		this.modified = modified;
 	}
 
@@ -105,6 +131,38 @@ public class CatalogCategory {
 
 	public void setItems( List<CatalogCategoryItem> items ) {
 		this.items = items;
+	}
+
+	public String getMetaTitle() {
+		return metaTitle;
+	}
+
+	public void setMetaTitle( String metaTitle ) {
+		this.metaTitle = metaTitle;
+	}
+
+	public String getMetaKeywords() {
+		return metaKeywords;
+	}
+
+	public void setMetaKeywords( String metaKeywords ) {
+		this.metaKeywords = metaKeywords;
+	}
+
+	public String getMetaDescription() {
+		return metaDescription;
+	}
+
+	public void setMetaDescription( String metaDescription ) {
+		this.metaDescription = metaDescription;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription( String description ) {
+		this.description = description;
 	}
 
 }

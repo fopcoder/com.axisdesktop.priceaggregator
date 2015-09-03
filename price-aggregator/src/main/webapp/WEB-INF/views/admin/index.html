@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta th:replace="include/meta" />
+</head>
+<body>
+	<div class="container">
+
+		<h1 class="page-header">Admin</h1>
+
+		<form th:action="@{/admin/provider/create}" method="POST">
+			<fieldset>
+				<legend>Поставщики</legend>
+				<div th:each="prov : ${providers}">
+					<a th:href="@{/admin/provider/update/}+${prov.id}" th:text="${prov.name}"></a> | 
+					<a th:href="@{/admin/provider/delete/}+${prov.id}">удалить</a>
+				</div>
+
+				<input type="text" name="name" /><br />
+				<textarea name="contact"></textarea><br />
+				<button type="submit">create</button>
+			</fieldset>
+		</form>
+		
+		<form th:action="@{/admin/category/create}" method="POST">
+			<fieldset>
+				<legend>Категории</legend>
+				<div th:each="cat : ${categories}">
+					<a th:href="@{/admin/category/update/}+${cat.id}" th:text="${cat.name}"></a> | 
+					<a th:href="@{/admin/category/delete/}+${cat.id}">удалить</a>
+				</div>
+
+				<input type="text" name="name" /><br />
+				
+				<button type="submit">create</button>
+			</fieldset>
+		</form>
+
+	</div>
+</body>
+</html>
+

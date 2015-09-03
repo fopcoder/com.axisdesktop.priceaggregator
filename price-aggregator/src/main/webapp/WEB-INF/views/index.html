@@ -9,8 +9,10 @@
 		<h1 class="page-header">
 			Price aggregator <small>{ compare your prices }</small>
 		</h1>
-
-		<div th:if="${categoryList} != null" th:each="cat : ${categoryList}">
+		<div>
+			<a th:href="@{/admin}">admin</a>
+		</div>
+		<div th:if="${categories} != null" th:each="cat : ${categories}">
 			<div th:text="${cat.name}"></div>
 		</div>
 
