@@ -48,7 +48,7 @@ public class AdminController {
 
 	@RequestMapping( value = "/provider/update/{providerId}", method = RequestMethod.GET )
 	public String editProvider( @PathVariable int providerId, Model model ) {
-		Provider provider = providerService.read( providerId );
+		Provider provider = providerService.getById( providerId );
 		model.addAttribute( "provider", provider );
 
 		return "admin/provider/edit";
@@ -79,7 +79,7 @@ public class AdminController {
 
 	@RequestMapping( value = "/category/update/{categoryId}", method = RequestMethod.GET )
 	public String editCategory( @PathVariable int categoryId, Model model ) {
-		CatalogCategory category = catalogCategoryService.read( categoryId );
+		CatalogCategory category = catalogCategoryService.getById( categoryId );
 		model.addAttribute( "category", category );
 
 		return "admin/category/edit";
@@ -110,7 +110,7 @@ public class AdminController {
 
 	@RequestMapping( value = "/currency/update/{currencyId}", method = RequestMethod.GET )
 	public String editCurrency( @PathVariable int currencyId, Model model ) {
-		Currency currency = currencyService.read( currencyId );
+		Currency currency = currencyService.getById( currencyId );
 		model.addAttribute( "currency", currency );
 
 		return "admin/currency/edit";

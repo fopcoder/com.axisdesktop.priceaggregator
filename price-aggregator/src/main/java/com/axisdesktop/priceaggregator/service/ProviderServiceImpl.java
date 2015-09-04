@@ -28,7 +28,7 @@ public class ProviderServiceImpl implements ProviderService {
 	}
 
 	@Override
-	public Provider read( int id ) {
+	public Provider getById( int id ) {
 		return providerRepository.findOne( id );
 	}
 

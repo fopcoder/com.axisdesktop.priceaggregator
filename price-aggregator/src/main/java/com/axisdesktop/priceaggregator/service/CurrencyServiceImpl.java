@@ -28,7 +28,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 	}
 
 	@Override
-	public Currency read( int id ) {
+	public Currency getById( int id ) {
 		return currencyRepository.findOne( id );
 	}
 

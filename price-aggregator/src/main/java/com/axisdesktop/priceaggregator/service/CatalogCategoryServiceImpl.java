@@ -28,7 +28,7 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	}
 
 	@Override
-	public CatalogCategory read( int id ) {
+	public CatalogCategory getById( int id ) {
 		return catalogCategoryRepository.findOne( id );
 	}
 

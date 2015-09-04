@@ -7,7 +7,7 @@ public interface BasicService<T> {
 
 	T create( T provider );
 
-	T read( int id );
+	T getById( int id );
 
 	T update( T provider );
 
