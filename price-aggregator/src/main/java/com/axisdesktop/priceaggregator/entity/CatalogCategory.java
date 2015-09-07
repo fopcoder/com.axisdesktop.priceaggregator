@@ -17,6 +17,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity
 @Table( name = "catalog_category" )
@@ -31,11 +32,11 @@ public class CatalogCategory {
 	// @Column( nullable = false )
 	private String path;
 
-	// @Column( nullable = false )
-	private int idx_left;
+	@Column( name = "idx_left" )
+	private int idxLeft;
 
-	// @Column( nullable = false )
-	private int idx_right;
+	@Column( name = "idx_right" )
+	private int idxRight;
 
 	@Column( updatable = false )
 	@Temporal( TemporalType.TIMESTAMP )
@@ -54,6 +55,9 @@ public class CatalogCategory {
 	private String metaDescription;
 
 	private String description;
+
+	@Column( name = "parent_id" )
+	private int parentId;
 
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
@@ -85,20 +89,20 @@ public class CatalogCategory {
 		this.name = name;
 	}
 
-	public int getIdx_left() {
-		return idx_left;
+	public int getIdxLeft() {
+		return idxLeft;
 	}
 
-	public void setIdx_left( int idx_left ) {
-		this.idx_left = idx_left;
+	public void setIdxLeft( int idx_left ) {
+		this.idxLeft = idx_left;
 	}
 
-	public int getIdx_right() {
-		return idx_right;
+	public int getIdxRight() {
+		return idxRight;
 	}
 
-	public void setIdx_right( int idx_right ) {
-		this.idx_right = idx_right;
+	public void setIdxRight( int idx_right ) {
+		this.idxRight = idx_right;
 	}
 
 	public String getPath() {
@@ -163,6 +167,24 @@ public class CatalogCategory {
 
 	public void setDescription( String description ) {
 		this.description = description;
+	}
+
+	public int getParentId() {
+		return parentId;
+	}
+
+	public void setParentId( int parentId ) {
+		this.parentId = parentId;
+	}
+
+	@Override
+	public String toString() {
+		return "CatalogCategory [id=" + id + ", name=" + name + ", path="
+				+ path + ", idx_left=" + idxLeft + ", idx_right=" + idxRight
+				+ ", created=" + created + ", modified=" + modified
+				+ ", metaTitle=" + metaTitle + ", metaKeywords=" + metaKeywords
+				+ ", metaDescription=" + metaDescription + ", description="
+				+ description + ", parentId=" + parentId + "]";
 	}
 
 }

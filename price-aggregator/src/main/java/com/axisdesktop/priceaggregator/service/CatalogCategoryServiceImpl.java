@@ -2,6 +2,10 @@ package com.axisdesktop.priceaggregator.service;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +20,34 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Autowired
 	private CatalogCategoryRepository catalogCategoryRepository;
 
+	@Autowired
+	private EntityManagerFactory emf;
+
 	@Override
 	public List<CatalogCategory> list() {
+
+		// EntityManager em = emf.createEntityManager();
+
+		// CriteriaBuilder cb = em.c
+
+		// TypedQuery<Object[]> q = em
+		// .createQuery(
+		// "SELECT c, ("
+		// + " SELECT c2.id FROM CatalogCategory c2 "
+		// + " WHERE c2.idx_left < c.idx_left AND c2.idx_right > c.idx_right"
+		// + ") AS y FROM CatalogCategory c",
+		// Object[].class );
+		// List<Object[]> list = q.getResultList();
+
+		// for( Object[] o : list ) {
+		// System.out.println( o[0] );
+		// System.out.println( o[1] );
+		// }
+
+		// em.close();
+
 		return catalogCategoryRepository.findAll();
+
 	}
 
 	@Override
