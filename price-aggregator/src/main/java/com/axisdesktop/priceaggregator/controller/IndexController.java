@@ -17,6 +17,8 @@ public class IndexController {
 	public String index( Model model ) {
 
 		model.addAttribute( "categories", catalogCategoryService.list() );
+		model.addAttribute( "megamenu", catalogCategoryService.megamenu() );
+
 		return "index";
 	}
 }

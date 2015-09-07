@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,11 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	public List<CatalogCategory> list() {
 
 		// EntityManager em = emf.createEntityManager();
+		// TypedQuery<CatalogCategory> q = em.createNamedQuery(
+		// "CatalogCategory.menu", CatalogCategory.class );
+		// List<CatalogCategory> menu = q.getResultList();
+		//
+		// System.out.println( menu );
 
 		// CriteriaBuilder cb = em.c
 
@@ -48,6 +52,20 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 		return catalogCategoryRepository.findAll();
 
+	}
+
+	@Override
+	public List<CatalogCategory> megamenu() {
+		EntityManager em = emf.createEntityManager();
+		TypedQuery<CatalogCategory> q = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
+		List<CatalogCategory> megamenu = q.getResultList();
+		em.close();
+
+		for( CatalogCategory cc : megamenu ) {
+			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
+		}
+
+		return megamenu;
 	}
 
 	@Override

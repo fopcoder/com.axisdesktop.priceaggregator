@@ -12,6 +12,9 @@
 		<div>
 			<a th:href="@{/admin}">admin</a>
 		</div>
+		
+		<div th:replace="include/megamenu"></div>
+		
 		<div th:if="${categories} != null" th:each="cat : ${categories}">
 			<div th:text="${cat.name}"></div>
 		</div>
