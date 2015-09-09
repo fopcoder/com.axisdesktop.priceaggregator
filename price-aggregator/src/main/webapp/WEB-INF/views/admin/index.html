@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta th:replace="include/meta" />
+<meta th:replace="admin/include/meta" />
 </head>
 <body>
 	<div class="container">
-
+		<div th:replace="admin/include/menu" />
+		
 		<h1 class="page-header">Admin</h1>
 
 		<form th:action="@{/admin/provider/create}" method="POST">
