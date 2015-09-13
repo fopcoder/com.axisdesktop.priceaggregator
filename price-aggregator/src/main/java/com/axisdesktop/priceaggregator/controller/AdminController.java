@@ -31,14 +31,13 @@ public class AdminController {
 	public String index( Model model ) {
 
 		model.addAttribute( "providers", providerService.list() );
-		model.addAttribute( "categories", catalogCategoryService.list() );
+		// model.addAttribute( "categories", catalogCategoryService.list() );
 		model.addAttribute( "currencies", currencyService.list() );
 
 		return "admin/index";
 	}
 
 	// providers
-
 	@RequestMapping( value = "/provider/create", method = RequestMethod.POST )
 	public String createProvider( @ModelAttribute Provider provider ) {
 		providerService.create( provider );

@@ -21,6 +21,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table( name = "catalog_category" )
 @NamedQueries( { @NamedQuery( name = "CatalogCategory.megamenu", query = "SELECT c FROM CatalogCategory c LEFT JOIN FETCH c.children WHERE c.parentId = 1 AND LENGTH(c.path) > 0 ORDER BY c.idxLeft" ) } )
@@ -66,6 +68,7 @@ public class CatalogCategory {
 	// @ManyToOne( fetch = FetchType.LAZY )
 	// private CatalogCategory parent;
 
+	@JsonIgnore
 	@OneToMany( fetch = FetchType.LAZY )
 	@JoinColumn( name = "parent_id" )
 	private List<CatalogCategory> children = new ArrayList<>();
@@ -73,6 +76,7 @@ public class CatalogCategory {
 	@Column( name = "status_id" )
 	private int statusId;
 
+	@JsonIgnore
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
 	private List<CatalogCategoryItem> items = new ArrayList<>();
