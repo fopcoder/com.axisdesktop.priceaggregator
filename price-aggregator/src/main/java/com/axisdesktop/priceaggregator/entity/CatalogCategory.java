@@ -66,7 +66,7 @@ public class CatalogCategory {
 	@Column( name = "parent_id", updatable = false )
 	private int parentId;
 
-	@Column( name = "status_id" )
+	@Column( name = "status_id", nullable = false )
 	private int statusId;
 
 	// @JsonIgnore

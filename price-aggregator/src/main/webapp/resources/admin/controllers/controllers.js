@@ -21,6 +21,7 @@ appCtrl.controller('CategoryEdit', [
 					function(response) {
 						$scope.category = response.data.category;
 						$scope.statuses = response.data.statuses;
+						$scope.selectedStatus = { id: response.data.category.statusId };
 					});
 
 			$scope.update = function() {
