@@ -12,8 +12,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table( name = "catalog_category_item" )
-public class CatalogCategoryItem {
+@Table( name = "catalog_item" )
+public class CatalogItem {
 
 	@Id
 	@GeneratedValue

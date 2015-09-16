@@ -13,13 +13,15 @@ import org.springframework.stereotype.Service;
 import com.axisdesktop.priceaggregator.entity.CatalogCategory;
 import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryRepository;
+import com.axisdesktop.priceaggregator.repository.CatalogCategoryStatusRepository;
 
 @Service
 public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Autowired
 	private CatalogCategoryRepository catalogCategoryRepository;
-
+	@Autowired
+	private CatalogCategoryStatusRepository catalogCategoryStatusRepository;
 	@Autowired
 	private EntityManagerFactory emf;
 
@@ -97,14 +99,12 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Override
 	public List<CatalogCategory> megamenu() {
 		EntityManager em = emf.createEntityManager();
-		TypedQuery<CatalogCategory> q = em.createNamedQuery(
-				"CatalogCategory.megamenu", CatalogCategory.class );
+		TypedQuery<CatalogCategory> q = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
 		List<CatalogCategory> megamenu = q.getResultList();
 		em.close();
 
 		for( CatalogCategory cc : megamenu ) {
-			System.out.println( cc.getName() + "======> "
-					+ cc.getChildren().size() );
+			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
 		}
 
 		return megamenu;

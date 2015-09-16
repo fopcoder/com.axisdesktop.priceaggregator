@@ -37,10 +37,12 @@ public class CatalogCategory {
 	// @Column( nullable = false )
 	private String path;
 
-	@Column( name = "idx_left" )
+	private String uri;
+
+	@Column( name = "idx_left", updatable = false, insertable = false )
 	private int idxLeft;
 
-	@Column( name = "idx_right" )
+	@Column( name = "idx_right", updatable = false, insertable = false )
 	private int idxRight;
 
 	@Column( updatable = false )
@@ -61,8 +63,16 @@ public class CatalogCategory {
 
 	private String description;
 
-	@Column( name = "parent_id" )
+	@Column( name = "parent_id", updatable = false )
 	private int parentId;
+
+	@Column( name = "status_id" )
+	private int statusId;
+
+	// @JsonIgnore
+	// @ManyToOne( optional = false, fetch = FetchType.LAZY )
+	// @JoinColumn( name = "status_id" )
+	// private CatalogCategoryStatus status;
 
 	// @JoinColumn( name = "parent_id" )
 	// @ManyToOne( fetch = FetchType.LAZY )
@@ -73,13 +83,10 @@ public class CatalogCategory {
 	@JoinColumn( name = "parent_id" )
 	private List<CatalogCategory> children = new ArrayList<>();
 
-	@Column( name = "status_id" )
-	private int statusId;
-
 	@JsonIgnore
 	@ManyToMany( fetch = FetchType.LAZY )
-	@JoinTable( name = "catalog_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
-	private List<CatalogCategoryItem> items = new ArrayList<>();
+	@JoinTable( name = "category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
+	private List<CatalogItem> items = new ArrayList<>();
 
 	@PrePersist
 	public void prePersist() {
@@ -147,11 +154,11 @@ public class CatalogCategory {
 		this.modified = modified;
 	}
 
-	public List<CatalogCategoryItem> getItems() {
+	public List<CatalogItem> getItems() {
 		return items;
 	}
 
-	public void setItems( List<CatalogCategoryItem> items ) {
+	public void setItems( List<CatalogItem> items ) {
 		this.items = items;
 	}
 
@@ -211,12 +218,21 @@ public class CatalogCategory {
 		this.statusId = statusId;
 	}
 
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri( String uri ) {
+		this.uri = uri;
+	}
+
 	@Override
 	public String toString() {
-		return "CatalogCategory [id=" + id + ", name=" + name + ", path=" + path + ", idxLeft=" + idxLeft
-				+ ", idxRight=" + idxRight + ", created=" + created + ", modified=" + modified + ", metaTitle="
-				+ metaTitle + ", metaKeywords=" + metaKeywords + ", metaDescription=" + metaDescription
-				+ ", description=" + description + ", parentId=" + parentId + ", statusId=" + statusId + "]";
+		return "CatalogCategory [id=" + id + ", name=" + name + ", path=" + path + ", uri=" + uri + ", idxLeft="
+				+ idxLeft + ", idxRight=" + idxRight + ", created=" + created + ", modified=" + modified
+				+ ", metaTitle=" + metaTitle + ", metaKeywords=" + metaKeywords + ", metaDescription="
+				+ metaDescription + ", description=" + description + ", parentId=" + parentId + ", statusId="
+				+ statusId + "]";
 	}
 
 }

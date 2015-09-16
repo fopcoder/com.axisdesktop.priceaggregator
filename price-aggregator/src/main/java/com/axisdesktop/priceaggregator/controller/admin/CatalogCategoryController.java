@@ -1,7 +1,10 @@
 package com.axisdesktop.priceaggregator.controller.admin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,60 +16,68 @@ import org.springframework.web.bind.annotation.RestController;
 import com.axisdesktop.priceaggregator.entity.CatalogCategory;
 import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.service.CatalogCategoryService;
+import com.axisdesktop.priceaggregator.service.CatalogCategoryStatusService;
 
 @RestController
 @RequestMapping( "/admin/category" )
-public class CategoryController {
+public class CatalogCategoryController {
 
 	@Autowired
-	CatalogCategoryService catalogCategoryService;
+	CatalogCategoryService ccService;
+
+	@Autowired
+	CatalogCategoryStatusService ccStatusService;
 
 	@RequestMapping( value = { "", "/list" }, method = RequestMethod.GET )
 	public List<CatalogCategory> index() {
-		return catalogCategoryService.list();
+		return ccService.list();
 	}
 
 	@RequestMapping( value = "/{id}", method = RequestMethod.GET )
-	public CatalogCategory view( @PathVariable int id ) {
-		CatalogCategory cat = null;
+	public Map<String, Object> view( @PathVariable int id ) {
+		Map<String, Object> res = new HashMap<>();
 
 		try {
-			cat = catalogCategoryService.getById( id );
+			res.put( "statuses", ccStatusService.list() );
+			res.put( "category", ccService.getById( id ) );
 		}
 		catch( NoSuchEntityException e ) {
-			System.err.println( "====> no such category " + id );
+			System.err.println( "===> no such category " + id );
+			res = null;
+		}
+		catch( Exception e ) {
+			System.err.println( "===> unknown exception" );
+			e.printStackTrace();
+			res = null;
 		}
 
-		return cat;
+		return res;
 	}
 
 	@RequestMapping( value = "/update", method = RequestMethod.POST )
 	public CatalogCategory update( @RequestBody CatalogCategory category ) {
-		CatalogCategory cat = null;
-
-		System.out.println( "=============>" + category );
+		CatalogCategory old = null;
 
 		try {
-			catalogCategoryService.update( category );
+			old = ccService.getById( category.getId() );
+			BeanUtils.copyProperties( category, old, new String[] { "parentId" } );
+
+			ccService.update( old );
 		}
-		catch( NoSuchEntityException e1 ) {
-			// TODO Auto-generated catch block
+		catch( NoSuchEntityException e2 ) {
+			System.err.println( "===> input category does not exist " );
+		}
+		catch( Exception e ) {
+			System.err.println( "===> unknown exception" );
+			e.printStackTrace();
 		}
 
-		try {
-			cat = catalogCategoryService.getById( category.getId() );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-		}
-
-		return cat;
+		return old;
 	}
 
 	@RequestMapping( value = "/category/create", method = RequestMethod.POST )
-	public CatalogCategory createCategory(
-			@ModelAttribute CatalogCategory category ) {
-		CatalogCategory newCat = catalogCategoryService.create( category );
+	public CatalogCategory createCategory( @ModelAttribute CatalogCategory category ) {
+		CatalogCategory newCat = ccService.create( category );
 
 		return newCat;
 	}
@@ -74,7 +85,7 @@ public class CategoryController {
 	@RequestMapping( value = "/category/delete/{categoryId}" )
 	public String deleteCategory( @PathVariable int categoryId ) {
 		try {
-			catalogCategoryService.delete( categoryId );
+			ccService.delete( categoryId );
 		}
 		catch( NoSuchEntityException e ) {
 			// TODO Auto-generated catch block

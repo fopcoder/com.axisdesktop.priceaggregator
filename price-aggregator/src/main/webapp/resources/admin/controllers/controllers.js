@@ -19,7 +19,8 @@ appCtrl.controller('CategoryEdit', [
 		function($scope, $routeParams, $http) {
 			$http.get(ctxPath + "/admin/category/" + $routeParams.id).then(
 					function(response) {
-						$scope.category = response.data;
+						$scope.category = response.data.category;
+						$scope.statuses = response.data.statuses;
 					});
 
 			$scope.update = function() {

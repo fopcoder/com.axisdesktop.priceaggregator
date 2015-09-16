@@ -6,4 +6,5 @@ import com.axisdesktop.priceaggregator.entity.CatalogCategory;
 
 public interface CatalogCategoryService extends BasicService<CatalogCategory> {
 	List<CatalogCategory> megamenu();
+	// List<CatalogCategory> listWith
 }
