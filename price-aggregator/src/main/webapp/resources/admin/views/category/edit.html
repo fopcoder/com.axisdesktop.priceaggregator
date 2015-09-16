@@ -1,44 +1,102 @@
-<h1 class="page-header">Категория {{category.name}}</h1>
 
-<form role="form" class="form-horizontal">
-	<div class="form-group">
-		<label for="id" class="control-label col-sm-2">ID:</label>
-		<div class="col-sm-5">
-			<p class="form-control-static">{{category.id}}</p>
-			<input type="hidden" name="id" value="{{category.id}}" >
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2">Создана:</label>
-		<div class="col-sm-5">
-			<p class="form-control-static">{{category.created}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2">Обновлена:</label>
-		<div class="col-sm-5">
-			<p class="form-control-static">{{category.modified}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label for="name" class="control-label col-sm-2">Название:</label>
-		<div class="col-sm-5">
-			<input type="text" name="name" id="name" value="{{category.name}}" class="form-control" >
-		</div>
-	</div>
-	<div class="form-group">
-		<label for="path" class="control-label col-sm-2">Путь:</label>
-		<div class="col-sm-5">
-			<input type="text" name="path" id="path" value="{{category.path}}" class="form-control" >
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2">Индексы:</label>
-		<div class="col-sm-5">
-			<p class="form-control-static">{{category.idxLeft}} / {{category.idxRight}}</p>
-		</div>
-	</div>
+<h1 class="page-header" data-ng-bind-template="Категория: {{category.name}}"></h1>
 
+<div class="row">
+<form role="form" name="form" class="form-horizontal" novalidate="true" data-ng-submit="update()">
+	<div class="form-group">
+		<div class="col-sm-2">
+		<button type="submit" class="btn btn-default" >Сохранить <span class="glyphicon glyphicon-save"></span></button>
+		</div>
+	</div>
+	<fieldset class="col-sm-6">
+		<legend>Основные</legend>
 		
-	
+		<div class="form-group">
+			<label class="control-label col-sm-2">ID:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.id}}</p>
+				<input type="hidden" name="id" data-ng-model="category.id" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">Родитель:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.parent}} [ {{category.parentId}} ]</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">Создана:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.created}}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">Обновлена:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.modified}}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="name" class="control-label col-sm-2">Название:</label>
+			<div class="col-sm-10">
+				<input type="text" name="name" id="name" data-ng-model="category.name" class="form-control" required>
+			</div>
+			<div data-ng-show="form.$submitted || form.name.$touched">
+		      <div data-ng-show="form.name.$error.required">Tell us your name.</div>
+		    </div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">Путь:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.path}}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="uro" class="control-label col-sm-2">URL:</label>
+			<div class="col-sm-10">
+				<input type="text" name="uri" id="uri" data-ng-model="category.uri" class="form-control" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="status" class="control-label col-sm-2">Статус:</label>
+			<div class="col-sm-10">
+				<input type="text" name="status_id" id="status_id" value="{{category.statusId}}" class="form-control" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">Индексы:</label>
+			<div class="col-sm-10">
+				<p class="form-control-static">{{category.idxLeft}} : {{category.idxRight}}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="description" class="col-sm-2">Описание:</label>
+			<div class="col-sm-10">
+				<textarea rows="4" class="form-control" name="description" id="description" data-ng-model="category.description"></textarea>
+			</div>
+		</div>
+	</fieldset>
+	<fieldset class="col-sm-6">
+		<legend>Мета</legend>
+		
+		<div class="form-group">
+			<label for="meta-title" class="col-sm-2">Title:</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" data-ng-model="category.metaTitle" name="meta_title" id="meta-title" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="meta-keywords" class="col-sm-2">Keywords:</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" data-ng-model="category.metaKeywords" name="meta_keywords" id="meta-keywords" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="meta-description" class="col-sm-2">Description:</label>
+			<div class="col-sm-10">
+				<textarea rows="4" class="form-control" name="meta_description" id="meta-description" data-ng-model="category.metaDescription"></textarea>
+			</div>
+		</div>
+	</fieldset>
 </form>
+</div>

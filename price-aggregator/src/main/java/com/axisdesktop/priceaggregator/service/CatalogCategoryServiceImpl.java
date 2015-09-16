@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.axisdesktop.priceaggregator.entity.CatalogCategory;
+import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryRepository;
 
 @Service
@@ -55,28 +56,20 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	}
 
 	@Override
-	public List<CatalogCategory> megamenu() {
-		EntityManager em = emf.createEntityManager();
-		TypedQuery<CatalogCategory> q = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
-		List<CatalogCategory> megamenu = q.getResultList();
-		em.close();
+	public CatalogCategory getById( int id ) throws NoSuchEntityException {
+		CatalogCategory cat = catalogCategoryRepository.findOne( id );
 
-		for( CatalogCategory cc : megamenu ) {
-			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
+		if( cat == null ) {
+			throw new NoSuchEntityException();
 		}
 
-		return megamenu;
+		return cat;
 	}
 
 	@Override
 	@Transactional
 	public CatalogCategory create( CatalogCategory category ) {
 		return catalogCategoryRepository.save( category );
-	}
-
-	@Override
-	public CatalogCategory getById( int id ) {
-		return catalogCategoryRepository.findOne( id );
 	}
 
 	@Override
@@ -99,6 +92,22 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public List<CatalogCategory> megamenu() {
+		EntityManager em = emf.createEntityManager();
+		TypedQuery<CatalogCategory> q = em.createNamedQuery(
+				"CatalogCategory.megamenu", CatalogCategory.class );
+		List<CatalogCategory> megamenu = q.getResultList();
+		em.close();
+
+		for( CatalogCategory cc : megamenu ) {
+			System.out.println( cc.getName() + "======> "
+					+ cc.getChildren().size() );
+		}
+
+		return megamenu;
 	}
 
 }
