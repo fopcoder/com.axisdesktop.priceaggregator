@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,11 +48,15 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory cat = ccService.getById( id );
-			if( cat == null ) throw new NoSuchEntityException( "Category id = "
-					+ id + " does not exists" );
+			if( cat == null ) throw new NoSuchEntityException( "Category id = " + id + " does not exists" );
+
+			CatalogCategory parent = ccService.getParentCategory( cat );
+			if( parent == null ) throw new NoSuchEntityException( "Category parent id = " + cat.getParentId()
+					+ " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", cat );
+			res.put( "parent", parent );
 			res.put( "success", true );
 		}
 		catch( NoSuchEntityException e ) {
@@ -77,11 +80,9 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory old = ccService.getById( category.getId() );
-			if( old == null ) throw new NoSuchEntityException( "Category id = "
-					+ category.getId() + " does not exists" );
+			if( old == null ) throw new NoSuchEntityException( "Category id = " + category.getId() + " does not exists" );
 
-			BeanUtils.copyProperties( category, old,
-					new String[] { "parentId" } );
+			BeanUtils.copyProperties( category, old, new String[] { "parentId", "idxLeft", "idxRight" } );
 
 			ccService.update( old );
 
@@ -105,12 +106,53 @@ public class CatalogCategoryController {
 		return res;
 	}
 
-	@RequestMapping( value = "/category/create", method = RequestMethod.POST )
-	public CatalogCategory createCategory(
-			@ModelAttribute CatalogCategory category ) {
-		CatalogCategory newCat = ccService.create( category );
+	@RequestMapping( value = "/new/{parentId}", method = RequestMethod.GET )
+	public Map<String, Object> addNew( @PathVariable int parentId ) {
+		Map<String, Object> res = new HashMap<>();
 
-		return newCat;
+		try {
+			CatalogCategory parent = ccService.getById( parentId );
+			if( parent == null ) throw new NoSuchEntityException( "Category id = " + parentId + " does not exists" );
+
+			res.put( "statuses", ccStatusService.list() );
+			res.put( "category", new CatalogCategory() );
+			res.put( "parent", parent );
+			res.put( "success", true );
+		}
+		catch( NoSuchEntityException e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+		}
+		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+
+			System.err.println( "===> unknown exception" );
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+	@RequestMapping( value = "/create", method = RequestMethod.POST )
+	public Map<String, Object> createCategory( @RequestBody CatalogCategory category ) {
+		Map<String, Object> res = new HashMap<>();
+
+		try {
+			CatalogCategory newCat = ccService.create( category );
+
+			res.put( "category", newCat );
+			res.put( "success", true );
+		}
+		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+
+			System.err.println( "===> unknown exception" );
+			e.printStackTrace();
+		}
+
+		return res;
 	}
 
 	@RequestMapping( value = "/category/delete/{categoryId}" )

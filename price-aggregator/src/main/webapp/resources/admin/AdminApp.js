@@ -14,9 +14,9 @@ app.config( [ '$routeProvider', function($routeProvider) {
 		templateUrl : resPath + '/views/category/index.html',
 		controller : 'Category'
 	})
-	.when('/category/new', {
-		templateUrl : resPath + '/views/category/edit.html',
-		controller : 'CategoryEdit'
+	.when('/category/new/:parentId', {
+		templateUrl : resPath + '/views/category/new.html',
+		controller : 'CategoryNew'
 	})
 	.when('/category/:id', {
 		templateUrl : resPath + '/views/category/edit.html',

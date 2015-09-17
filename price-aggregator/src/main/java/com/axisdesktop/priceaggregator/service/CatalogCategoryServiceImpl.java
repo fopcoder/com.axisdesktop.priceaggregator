@@ -3,7 +3,6 @@ package com.axisdesktop.priceaggregator.service;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -33,7 +32,6 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Override
 	public List<CatalogCategory> list() {
 
-		// EntityManager em = emf.createEntityManager();
 		// TypedQuery<CatalogCategory> q = em.createNamedQuery(
 		// "CatalogCategory.menu", CatalogCategory.class );
 		// List<CatalogCategory> menu = q.getResultList();
@@ -69,14 +67,56 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Override
 	@Transactional
 	public CatalogCategory create( CatalogCategory category ) {
-		return ссRepository.save( category );
+		CatalogCategory parent = ссRepository.findOne( category.getParentId() );
+		CatalogCategory newCat = null;
+
+		if( parent != null ) {
+			category.setIdxLeft( parent.getIdxLeft() + 1 );
+			category.setIdxRight( parent.getIdxLeft() + 2 );
+
+			em.createQuery( "UPDATE CatalogCategory SET idxLeft = idxLeft + 2 WHERE idxLeft > ?0" )
+					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
+			em.createQuery( "UPDATE CatalogCategory SET idxRight = idxRight + 2 WHERE idxRight > ?0" )
+					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
+
+			newCat = ссRepository.save( category );
+		}
+
+		return newCat;
 	}
 
 	@Override
 	@Transactional
 	public CatalogCategory update( CatalogCategory category ) {
 		if( ссRepository.exists( category.getId() ) ) {
-			return ссRepository.save( category );
+
+			// URI && Path
+
+			if( category.getIdxLeft() == 1 ) {
+				category.setPath( "/" );
+				category.setUri( "" );
+			}
+			else {
+				CatalogCategory parent = this.getParentCategory( category );
+
+				String uri = category.getUri();
+
+				if( uri.length() > 0 ) {
+					uri = uri.replace( "/", "" );
+					category.setPath( "/" + category.getUri() );
+
+					if( !parent.getPath().equals( "/" ) ) {
+						category.setPath( parent.getPath() + category.getPath() );
+					}
+				}
+				else {
+					category.setPath( "" );
+				}
+			}
+
+			ссRepository.save( category );
+
+			return category;
 		}
 
 		return null;
@@ -96,18 +136,29 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Override
 	public List<CatalogCategory> megamenu() {
-		// EntityManager em = emf.createEntityManager();
-		TypedQuery<CatalogCategory> q = em.createNamedQuery(
-				"CatalogCategory.megamenu", CatalogCategory.class );
-		List<CatalogCategory> megamenu = q.getResultList();
+		TypedQuery<CatalogCategory> query = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
+		List<CatalogCategory> megamenu = query.getResultList();
 		em.close();
 
 		for( CatalogCategory cc : megamenu ) {
-			System.out.println( cc.getName() + "======> "
-					+ cc.getChildren().size() );
+			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
 		}
 
 		return megamenu;
+	}
+
+	@Override
+	public CatalogCategory getParentCategory( CatalogCategory category ) {
+		CatalogCategory parent = null;
+
+		if( category != null ) {
+			TypedQuery<CatalogCategory> query = em
+					.createNamedQuery( "CatalogCategory.getParent", CatalogCategory.class );
+			parent = query.setParameter( "idxLeft", category.getIdxLeft() )
+					.setParameter( "idxRight", category.getIdxRight() ).setMaxResults( 1 ).getSingleResult();
+		}
+
+		return parent;
 	}
 
 }

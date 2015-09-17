@@ -25,7 +25,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table( name = "catalog_category" )
-@NamedQueries( { @NamedQuery( name = "CatalogCategory.megamenu", query = "SELECT c FROM CatalogCategory c LEFT JOIN FETCH c.children WHERE c.parentId = 1 AND LENGTH(c.path) > 0 ORDER BY c.idxLeft" ) } )
+@NamedQueries( {
+		@NamedQuery( name = "CatalogCategory.megamenu", query = "SELECT c FROM CatalogCategory c LEFT JOIN FETCH c.children WHERE c.parentId = 1 AND LENGTH(c.path) > 0 ORDER BY c.idxLeft" ),
+		@NamedQuery( name = "CatalogCategory.getParent", query = "SELECT c FROM CatalogCategory c WHERE c.idxLeft < :idxLeft AND c.idxRight > :idxRight ORDER BY c.idxLeft DESC" ) } )
 public class CatalogCategory {
 	@Id
 	@GeneratedValue
@@ -34,15 +36,14 @@ public class CatalogCategory {
 	@Column( nullable = false )
 	private String name;
 
-	// @Column( nullable = false )
-	private String path;
+	private String path = "";
 
-	private String uri;
+	private String uri = "";
 
-	@Column( name = "idx_left", updatable = false, insertable = false )
+	@Column( name = "idx_left" )
 	private int idxLeft;
 
-	@Column( name = "idx_right", updatable = false, insertable = false )
+	@Column( name = "idx_right" )
 	private int idxRight;
 
 	@Column( updatable = false )
@@ -53,17 +54,17 @@ public class CatalogCategory {
 	private Calendar modified;
 
 	@Column( name = "meta_title" )
-	private String metaTitle;
+	private String metaTitle = "";
 
 	@Column( name = "meta_keywords" )
-	private String metaKeywords;
+	private String metaKeywords = "";
 
 	@Column( name = "meta_description" )
-	private String metaDescription;
+	private String metaDescription = "";
 
-	private String description;
+	private String description = "";
 
-	@Column( name = "parent_id", updatable = false )
+	@Column( name = "parent_id" )
 	private int parentId;
 
 	@Column( name = "status_id", nullable = false )
@@ -85,7 +86,7 @@ public class CatalogCategory {
 
 	@JsonIgnore
 	@ManyToMany( fetch = FetchType.LAZY )
-	@JoinTable( name = "category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
+	@JoinTable( name = "catalog_category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
 	private List<CatalogItem> items = new ArrayList<>();
 
 	@PrePersist

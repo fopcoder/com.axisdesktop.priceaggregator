@@ -7,12 +7,12 @@
 		<th>Путь</th>
 		<th></th>
 	</tr>
-	<tr ng-repeat="cat in categories | filter:search">
+	<tr ng-repeat="cat in categories">
 		<td><a href="#category/{{cat.id}}">{{cat.id}}</a></td>
 		<td><a href="#category/{{cat.id}}">{{cat.name}}</a></td>
 		<td>{{cat.path}}</td>
+		<td><a href="#category/new/{{cat.id}}"><span class="glyphicon glyphicon-plus"></span></a></td>
 		<td><a href="#category/{{cat.id}}"><span class="glyphicon glyphicon-remove"></span></a></td>
 	</tr>
 </table>
 
-<a href="#/category/create" class="btn btn-warning">добавить</a> 
