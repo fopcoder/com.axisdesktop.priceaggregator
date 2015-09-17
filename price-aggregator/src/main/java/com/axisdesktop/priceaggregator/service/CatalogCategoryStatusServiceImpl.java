@@ -10,7 +10,8 @@ import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryStatusRepository;
 
 @Service
-public class CatalogCategoryStatusServiceImpl implements CatalogCategoryStatusService {
+public class CatalogCategoryStatusServiceImpl implements
+		CatalogCategoryStatusService {
 
 	@Autowired
 	CatalogCategoryStatusRepository ccSrviceRepository;
@@ -27,13 +28,14 @@ public class CatalogCategoryStatusServiceImpl implements CatalogCategoryStatusSe
 	}
 
 	@Override
-	public CatalogCategoryStatus getById( int id ) throws NoSuchEntityException {
+	public CatalogCategoryStatus getById( int id ) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CatalogCategoryStatus update( CatalogCategoryStatus provider ) throws NoSuchEntityException {
+	public CatalogCategoryStatus update( CatalogCategoryStatus provider )
+			throws NoSuchEntityException {
 		// TODO Auto-generated method stub
 		return null;
 	}

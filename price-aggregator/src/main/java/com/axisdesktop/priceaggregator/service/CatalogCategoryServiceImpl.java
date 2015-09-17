@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.axisdesktop.priceaggregator.entity.CatalogCategory;
-import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryRepository;
 import com.axisdesktop.priceaggregator.repository.CatalogCategoryStatusRepository;
 
@@ -19,11 +19,16 @@ import com.axisdesktop.priceaggregator.repository.CatalogCategoryStatusRepositor
 public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Autowired
-	private CatalogCategoryRepository catalogCategoryRepository;
+	private CatalogCategoryRepository ссRepository;
+
 	@Autowired
-	private CatalogCategoryStatusRepository catalogCategoryStatusRepository;
-	@Autowired
-	private EntityManagerFactory emf;
+	private CatalogCategoryStatusRepository cсStatusRepository;
+
+	// @Autowired
+	// private EntityManagerFactory emf;
+
+	@PersistenceContext
+	private EntityManager em;
 
 	@Override
 	public List<CatalogCategory> list() {
@@ -53,32 +58,25 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 		// em.close();
 
-		return catalogCategoryRepository.findAll();
-
+		return ссRepository.findAll();
 	}
 
 	@Override
-	public CatalogCategory getById( int id ) throws NoSuchEntityException {
-		CatalogCategory cat = catalogCategoryRepository.findOne( id );
-
-		if( cat == null ) {
-			throw new NoSuchEntityException();
-		}
-
-		return cat;
+	public CatalogCategory getById( int id ) {
+		return ссRepository.findOne( id );
 	}
 
 	@Override
 	@Transactional
 	public CatalogCategory create( CatalogCategory category ) {
-		return catalogCategoryRepository.save( category );
+		return ссRepository.save( category );
 	}
 
 	@Override
 	@Transactional
 	public CatalogCategory update( CatalogCategory category ) {
-		if( catalogCategoryRepository.exists( category.getId() ) ) {
-			return catalogCategoryRepository.save( category );
+		if( ссRepository.exists( category.getId() ) ) {
+			return ссRepository.save( category );
 		}
 
 		return null;
@@ -87,10 +85,10 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Override
 	@Transactional
 	public CatalogCategory delete( int id ) {
-		CatalogCategory category = catalogCategoryRepository.findOne( id );
+		CatalogCategory category = ссRepository.findOne( id );
 
 		if( category != null ) {
-			catalogCategoryRepository.delete( category );
+			ссRepository.delete( category );
 		}
 
 		return null;
@@ -98,13 +96,15 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Override
 	public List<CatalogCategory> megamenu() {
-		EntityManager em = emf.createEntityManager();
-		TypedQuery<CatalogCategory> q = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
+		// EntityManager em = emf.createEntityManager();
+		TypedQuery<CatalogCategory> q = em.createNamedQuery(
+				"CatalogCategory.megamenu", CatalogCategory.class );
 		List<CatalogCategory> megamenu = q.getResultList();
 		em.close();
 
 		for( CatalogCategory cc : megamenu ) {
-			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
+			System.out.println( cc.getName() + "======> "
+					+ cc.getChildren().size() );
 		}
 
 		return megamenu;

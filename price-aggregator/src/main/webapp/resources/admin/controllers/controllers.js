@@ -7,8 +7,15 @@ appCtrl.controller('Index', [ '$scope', function($scope) {
 } ]);
 
 appCtrl.controller('Category', [ '$scope', '$http', function($scope, $http) {
-	$http.get("/price-aggregator/admin/category").success(function(data) {
-		$scope.categories = data;
+	$http.get("/price-aggregator/admin/category").then(function(response) {
+		if (response.data.success) {
+			$scope.categories = response.data.categories;
+		} else {
+			$scope.categories = [];
+			alert(response.data.message);
+		}
+	}, function(response) {
+		alert('network/server error');
 	});
 } ]);
 
@@ -19,22 +26,31 @@ appCtrl.controller('CategoryEdit', [
 		function($scope, $routeParams, $http) {
 			$http.get(ctxPath + "/admin/category/" + $routeParams.id).then(
 					function(response) {
-						$scope.category = response.data.category;
-						$scope.statuses = response.data.statuses;
-						$scope.selectedStatus = { id: response.data.category.statusId };
+						if (response.data.success) {
+							$scope.category = response.data.category;
+							$scope.statuses = response.data.statuses;
+						} else {
+							$scope.category = {};
+							alert(response.data.message);
+						}
+					}, function(response) {
+						alert('network/server error');
 					});
 
 			$scope.update = function() {
-				console.log($scope.category);
-
 				$http.post(ctxPath + '/admin/category/update', $scope.category)
 						.then(function(response) {
-							$scope.category = response.data;
+							if (response.data.success) {
+								$scope.category = response.data.category;
+								alert("сохранено");
+							} else {
+								$scope.category = {};
+								alert(response.data.message);
+							}
+						}, function(response) {
+							alert('network/server error');
 						});
-
 			}
+
 		} ]);
 
-// app.controller('Date', [ '$scope', function($scope) {
-// $scope.now = new Date();
-// } ]);

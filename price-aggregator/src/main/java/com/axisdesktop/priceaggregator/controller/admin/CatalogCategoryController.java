@@ -1,7 +1,6 @@
 package com.axisdesktop.priceaggregator.controller.admin;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
@@ -29,8 +28,19 @@ public class CatalogCategoryController {
 	CatalogCategoryStatusService ccStatusService;
 
 	@RequestMapping( value = { "", "/list" }, method = RequestMethod.GET )
-	public List<CatalogCategory> index() {
-		return ccService.list();
+	public Map<String, Object> index() {
+		Map<String, Object> res = new HashMap<>();
+
+		try {
+			res.put( "categories", ccService.list() );
+			res.put( "success", true );
+		}
+		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+		}
+
+		return res;
 	}
 
 	@RequestMapping( value = "/{id}", method = RequestMethod.GET )
@@ -38,45 +48,66 @@ public class CatalogCategoryController {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
+			CatalogCategory cat = ccService.getById( id );
+			if( cat == null ) throw new NoSuchEntityException( "Category id = "
+					+ id + " does not exists" );
+
 			res.put( "statuses", ccStatusService.list() );
-			res.put( "category", ccService.getById( id ) );
+			res.put( "category", cat );
+			res.put( "success", true );
 		}
 		catch( NoSuchEntityException e ) {
-			System.err.println( "===> no such category " + id );
-			res = null;
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
 		}
 		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+
 			System.err.println( "===> unknown exception" );
 			e.printStackTrace();
-			res = null;
 		}
 
 		return res;
 	}
 
 	@RequestMapping( value = "/update", method = RequestMethod.POST )
-	public CatalogCategory update( @RequestBody CatalogCategory category ) {
-		CatalogCategory old = null;
+	public Map<String, Object> update( @RequestBody CatalogCategory category ) {
+		Map<String, Object> res = new HashMap<>();
 
 		try {
-			old = ccService.getById( category.getId() );
-			BeanUtils.copyProperties( category, old, new String[] { "parentId" } );
+			CatalogCategory old = ccService.getById( category.getId() );
+			if( old == null ) throw new NoSuchEntityException( "Category id = "
+					+ category.getId() + " does not exists" );
+
+			BeanUtils.copyProperties( category, old,
+					new String[] { "parentId" } );
 
 			ccService.update( old );
+
+			old = ccService.getById( category.getId() );
+
+			res.put( "category", old );
+			res.put( "success", true );
 		}
-		catch( NoSuchEntityException e2 ) {
-			System.err.println( "===> input category does not exist " );
+		catch( NoSuchEntityException e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
 		}
 		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+
 			System.err.println( "===> unknown exception" );
 			e.printStackTrace();
 		}
 
-		return old;
+		return res;
 	}
 
 	@RequestMapping( value = "/category/create", method = RequestMethod.POST )
-	public CatalogCategory createCategory( @ModelAttribute CatalogCategory category ) {
+	public CatalogCategory createCategory(
+			@ModelAttribute CatalogCategory category ) {
 		CatalogCategory newCat = ccService.create( category );
 
 		return newCat;

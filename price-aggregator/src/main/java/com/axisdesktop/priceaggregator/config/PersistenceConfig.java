@@ -81,6 +81,8 @@ public class PersistenceConfig {
 		// ) );
 		jpaProperties.put( "hibernate.format_sql",
 				environment.getProperty( "hibernate.format_sql" ) );
+		// jpaProperties.put( "hibernate.connection.charSet",
+		// environment.getProperty( "hibernate.connection.charSet" ) );
 
 		// jpaProperties.put( "hibernate.hbm2ddl.auto", environment.getProperty(
 		// "hibernate.hbm2ddl.auto" ) );

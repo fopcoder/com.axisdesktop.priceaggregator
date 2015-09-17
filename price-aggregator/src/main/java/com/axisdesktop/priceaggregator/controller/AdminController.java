@@ -48,13 +48,8 @@ public class AdminController {
 	@RequestMapping( value = "/provider/update/{providerId}", method = RequestMethod.GET )
 	public String editProvider( @PathVariable int providerId, Model model ) {
 		Provider provider = null;
-		try {
-			provider = providerService.getById( providerId );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		provider = providerService.getById( providerId );
+
 		model.addAttribute( "provider", provider );
 
 		return "admin/provider/edit";
@@ -98,13 +93,7 @@ public class AdminController {
 	@RequestMapping( value = "/currency/update/{currencyId}", method = RequestMethod.GET )
 	public String editCurrency( @PathVariable int currencyId, Model model ) {
 		Currency currency = null;
-		try {
-			currency = currencyService.getById( currencyId );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		currency = currencyService.getById( currencyId );
 		model.addAttribute( "currency", currency );
 
 		return "admin/currency/edit";

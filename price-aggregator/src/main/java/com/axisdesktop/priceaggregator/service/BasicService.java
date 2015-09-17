@@ -9,7 +9,7 @@ public interface BasicService<T> {
 
 	T create( T provider );
 
-	T getById( int id ) throws NoSuchEntityException;
+	T getById( int id );
 
 	T update( T provider ) throws NoSuchEntityException;
 
