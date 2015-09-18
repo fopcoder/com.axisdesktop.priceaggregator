@@ -1,5 +1,6 @@
 package com.axisdesktop.priceaggregator.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -23,40 +24,34 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Autowired
 	private CatalogCategoryStatusRepository cсStatusRepository;
 
-	// @Autowired
-	// private EntityManagerFactory emf;
-
 	@PersistenceContext
 	private EntityManager em;
 
 	@Override
 	public List<CatalogCategory> list() {
-
-		// TypedQuery<CatalogCategory> q = em.createNamedQuery(
-		// "CatalogCategory.menu", CatalogCategory.class );
-		// List<CatalogCategory> menu = q.getResultList();
-		//
-		// System.out.println( menu );
-
-		// CriteriaBuilder cb = em.c
-
-		// TypedQuery<Object[]> q = em
-		// .createQuery(
-		// "SELECT c, ("
-		// + " SELECT c2.id FROM CatalogCategory c2 "
-		// + " WHERE c2.idx_left < c.idx_left AND c2.idx_right > c.idx_right"
-		// + ") AS y FROM CatalogCategory c",
-		// Object[].class );
-		// List<Object[]> list = q.getResultList();
-
-		// for( Object[] o : list ) {
-		// System.out.println( o[0] );
-		// System.out.println( o[1] );
-		// }
-
-		// em.close();
-
 		return ссRepository.findAll();
+	}
+
+	@Override
+	public List<CatalogCategory> listAsTree() {
+		return em.createNamedQuery( "CatalogCategory.listAsTree",
+				CatalogCategory.class ).getResultList();
+	}
+
+	@Override
+	public List<CatalogCategory> listAsTreeWithLevel() {
+		List<Object[]> tmp = em.createNamedQuery(
+				"CatalogCategory.listAsTreeWithLevel", Object[].class )
+				.getResultList();
+
+		List<CatalogCategory> res = new ArrayList<>();
+
+		for( Object[] obj : tmp ) {
+			( (CatalogCategory)obj[0] ).setLevel( (long)obj[1] );
+			res.add( ( (CatalogCategory)obj[0] ) );
+		}
+
+		return res;
 	}
 
 	@Override
@@ -65,8 +60,13 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	}
 
 	@Override
-	@Transactional
 	public CatalogCategory create( CatalogCategory category ) {
+		return this.prependCategory( category );
+	}
+
+	@Override
+	@Transactional
+	public CatalogCategory prependCategory( CatalogCategory category ) {
 		CatalogCategory parent = ссRepository.findOne( category.getParentId() );
 		CatalogCategory newCat = null;
 
@@ -74,9 +74,13 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 			category.setIdxLeft( parent.getIdxLeft() + 1 );
 			category.setIdxRight( parent.getIdxLeft() + 2 );
 
-			em.createQuery( "UPDATE CatalogCategory SET idxLeft = idxLeft + 2 WHERE idxLeft > ?0" )
+			this.composeUriPath( category, parent );
+
+			em.createQuery(
+					"UPDATE CatalogCategory SET idxLeft = idxLeft + 2 WHERE idxLeft > ?0" )
 					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
-			em.createQuery( "UPDATE CatalogCategory SET idxRight = idxRight + 2 WHERE idxRight > ?0" )
+			em.createQuery(
+					"UPDATE CatalogCategory SET idxRight = idxRight + 2 WHERE idxRight > ?0" )
 					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
 
 			newCat = ссRepository.save( category );
@@ -89,31 +93,7 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	@Transactional
 	public CatalogCategory update( CatalogCategory category ) {
 		if( ссRepository.exists( category.getId() ) ) {
-
-			// URI && Path
-
-			if( category.getIdxLeft() == 1 ) {
-				category.setPath( "/" );
-				category.setUri( "" );
-			}
-			else {
-				CatalogCategory parent = this.getParentCategory( category );
-
-				String uri = category.getUri();
-
-				if( uri.length() > 0 ) {
-					uri = uri.replace( "/", "" );
-					category.setPath( "/" + category.getUri() );
-
-					if( !parent.getPath().equals( "/" ) ) {
-						category.setPath( parent.getPath() + category.getPath() );
-					}
-				}
-				else {
-					category.setPath( "" );
-				}
-			}
-
+			this.composeUriPath( category, this.getParentCategory( category ) );
 			ссRepository.save( category );
 
 			return category;
@@ -136,13 +116,14 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Override
 	public List<CatalogCategory> megamenu() {
-		TypedQuery<CatalogCategory> query = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class );
+		TypedQuery<CatalogCategory> query = em.createNamedQuery(
+				"CatalogCategory.megamenu", CatalogCategory.class );
 		List<CatalogCategory> megamenu = query.getResultList();
-		em.close();
 
-		for( CatalogCategory cc : megamenu ) {
-			System.out.println( cc.getName() + "======> " + cc.getChildren().size() );
-		}
+		// for( CatalogCategory cc : megamenu ) {
+		// System.out.println( cc.getName() + "======> "
+		// + cc.getChildren().size() );
+		// }
 
 		return megamenu;
 	}
@@ -152,13 +133,43 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 		CatalogCategory parent = null;
 
 		if( category != null ) {
-			TypedQuery<CatalogCategory> query = em
-					.createNamedQuery( "CatalogCategory.getParent", CatalogCategory.class );
+			TypedQuery<CatalogCategory> query = em.createNamedQuery(
+					"CatalogCategory.getParent", CatalogCategory.class );
 			parent = query.setParameter( "idxLeft", category.getIdxLeft() )
-					.setParameter( "idxRight", category.getIdxRight() ).setMaxResults( 1 ).getSingleResult();
+					.setParameter( "idxRight", category.getIdxRight() )
+					.setMaxResults( 1 ).getSingleResult();
 		}
 
 		return parent;
 	}
 
+	@Override
+	// TODO make recursive change path
+	public void composeUriPath( CatalogCategory category, CatalogCategory parent ) {
+		if( category == null || parent == null ) throw new IllegalArgumentException(
+				"catalog & parent must be not null" );
+
+		if( category.getIdxLeft() == 1 ) {
+			category.setPath( "/" );
+			category.setUri( "" );
+		}
+		else if( parent.getUri().length() == 0 ) {
+			category.setPath( "" );
+		}
+		else {
+			String uri = category.getUri();
+
+			if( uri.length() > 0 ) {
+				uri = uri.replace( "/", "" );
+				category.setPath( "/" + category.getUri() );
+
+				if( !parent.getPath().equals( "/" ) ) {
+					category.setPath( parent.getPath() + category.getPath() );
+				}
+			}
+			else {
+				category.setPath( "" );
+			}
+		}
+	}
 }

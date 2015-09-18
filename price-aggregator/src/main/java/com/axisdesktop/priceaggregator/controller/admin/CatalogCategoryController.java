@@ -31,7 +31,7 @@ public class CatalogCategoryController {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
-			res.put( "categories", ccService.list() );
+			res.put( "categories", ccService.listAsTreeWithLevel() );
 			res.put( "success", true );
 		}
 		catch( Exception e ) {
@@ -48,11 +48,13 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory cat = ccService.getById( id );
-			if( cat == null ) throw new NoSuchEntityException( "Category id = " + id + " does not exists" );
+			if( cat == null ) throw new NoSuchEntityException( "Category id = "
+					+ id + " does not exists" );
 
 			CatalogCategory parent = ccService.getParentCategory( cat );
-			if( parent == null ) throw new NoSuchEntityException( "Category parent id = " + cat.getParentId()
-					+ " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException(
+					"Category parent id = " + cat.getParentId()
+							+ " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", cat );
@@ -80,9 +82,11 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory old = ccService.getById( category.getId() );
-			if( old == null ) throw new NoSuchEntityException( "Category id = " + category.getId() + " does not exists" );
+			if( old == null ) throw new NoSuchEntityException( "Category id = "
+					+ category.getId() + " does not exists" );
 
-			BeanUtils.copyProperties( category, old, new String[] { "parentId", "idxLeft", "idxRight" } );
+			BeanUtils.copyProperties( category, old, new String[] { "parentId",
+					"idxLeft", "idxRight" } );
 
 			ccService.update( old );
 
@@ -112,7 +116,8 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory parent = ccService.getById( parentId );
-			if( parent == null ) throw new NoSuchEntityException( "Category id = " + parentId + " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException(
+					"Category id = " + parentId + " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", new CatalogCategory() );
@@ -135,11 +140,12 @@ public class CatalogCategoryController {
 	}
 
 	@RequestMapping( value = "/create", method = RequestMethod.POST )
-	public Map<String, Object> createCategory( @RequestBody CatalogCategory category ) {
+	public Map<String, Object> createCategory(
+			@RequestBody CatalogCategory category ) {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
-			CatalogCategory newCat = ccService.create( category );
+			CatalogCategory newCat = ccService.prependCategory( category );
 
 			res.put( "category", newCat );
 			res.put( "success", true );
@@ -157,13 +163,7 @@ public class CatalogCategoryController {
 
 	@RequestMapping( value = "/category/delete/{categoryId}" )
 	public String deleteCategory( @PathVariable int categoryId ) {
-		try {
-			ccService.delete( categoryId );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ccService.delete( categoryId );
 
 		return "redirect:/admin";
 	}

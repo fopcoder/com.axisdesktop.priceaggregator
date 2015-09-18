@@ -2,16 +2,14 @@ package com.axisdesktop.priceaggregator.service;
 
 import java.util.List;
 
-import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
-
 public interface BasicService<T> {
 	List<T> list();
 
-	T create( T provider );
+	T create( T entity );
 
 	T getById( int id );
 
-	T update( T provider ) throws NoSuchEntityException;
+	T update( T entity );
 
-	T delete( int id ) throws NoSuchEntityException;
+	T delete( int id );
 }

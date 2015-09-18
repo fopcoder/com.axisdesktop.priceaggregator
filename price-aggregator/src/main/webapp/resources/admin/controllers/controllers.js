@@ -75,6 +75,7 @@ appCtrl.controller('CategoryNew', [
 					}, function(response) {
 						alert('network/server error');
 					})
+					
 			$scope.create = function() {
 				console.log($scope.category);
 

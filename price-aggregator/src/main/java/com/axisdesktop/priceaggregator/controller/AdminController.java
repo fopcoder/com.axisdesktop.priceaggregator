@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.axisdesktop.priceaggregator.entity.Currency;
 import com.axisdesktop.priceaggregator.entity.Provider;
-import com.axisdesktop.priceaggregator.exception.NoSuchEntityException;
 import com.axisdesktop.priceaggregator.service.CatalogCategoryService;
 import com.axisdesktop.priceaggregator.service.CurrencyService;
 import com.axisdesktop.priceaggregator.service.ProviderService;
@@ -57,26 +56,14 @@ public class AdminController {
 
 	@RequestMapping( value = "/provider/update", method = RequestMethod.POST )
 	public String updateProvider( @ModelAttribute Provider provider ) {
-		try {
-			providerService.update( provider );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		providerService.update( provider );
 
 		return "redirect:/admin";
 	}
 
 	@RequestMapping( value = "/provider/delete/{providerId}" )
 	public String deleteProvider( @PathVariable int providerId, Model model ) {
-		try {
-			providerService.delete( providerId );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		providerService.delete( providerId );
 
 		return "redirect:/admin";
 	}
@@ -101,26 +88,14 @@ public class AdminController {
 
 	@RequestMapping( value = "/currency/update", method = RequestMethod.POST )
 	public String updateCurrency( @ModelAttribute Currency currency ) {
-		try {
-			currencyService.update( currency );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		currencyService.update( currency );
 
 		return "redirect:/admin";
 	}
 
 	@RequestMapping( value = "/currency/delete/{currencyId}" )
 	public String deleteCurrency( @PathVariable int currencyId ) {
-		try {
-			currencyService.delete( currencyId );
-		}
-		catch( NoSuchEntityException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		currencyService.delete( currencyId );
 
 		return "redirect:/admin";
 	}

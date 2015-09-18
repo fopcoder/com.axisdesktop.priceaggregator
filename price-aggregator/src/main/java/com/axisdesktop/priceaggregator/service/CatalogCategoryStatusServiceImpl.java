@@ -34,14 +34,13 @@ public class CatalogCategoryStatusServiceImpl implements
 	}
 
 	@Override
-	public CatalogCategoryStatus update( CatalogCategoryStatus provider )
-			throws NoSuchEntityException {
+	public CatalogCategoryStatus update( CatalogCategoryStatus provider ) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CatalogCategoryStatus delete( int id ) throws NoSuchEntityException {
+	public CatalogCategoryStatus delete( int id ) {
 		// TODO Auto-generated method stub
 		return null;
 	}

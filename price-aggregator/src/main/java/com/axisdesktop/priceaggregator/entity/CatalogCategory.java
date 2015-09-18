@@ -14,19 +14,24 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table( name = "catalog_category" )
 @NamedQueries( {
-		@NamedQuery( name = "CatalogCategory.megamenu", query = "SELECT c FROM CatalogCategory c LEFT JOIN FETCH c.children WHERE c.parentId = 1 AND LENGTH(c.path) > 0 ORDER BY c.idxLeft" ),
+		@NamedQuery( name = "CatalogCategory.megamenu", query = "SELECT c FROM CatalogCategory c ORDER BY c.idxLeft" ),
+		// @NamedQuery( name = "CatalogCategory.megamenu", query =
+		// "SELECT c FROM CatalogCategory c LEFT JOIN FETCH c.children WHERE c.parentId = 1 AND LENGTH(c.path) > 0 ORDER BY c.idxLeft"
+		// ),
+		@NamedQuery( name = "CatalogCategory.listAsTree", query = "SELECT c FROM CatalogCategory c ORDER BY c.idxLeft" ),
+		@NamedQuery( name = "CatalogCategory.listAsTreeWithLevel", query = "SELECT c, (SELECT COUNT(*) FROM CatalogCategory c1 WHERE c.idxLeft > c1.idxLeft AND c1.idxRight > c.idxRight) FROM CatalogCategory c ORDER BY c.idxLeft" ),
 		@NamedQuery( name = "CatalogCategory.getParent", query = "SELECT c FROM CatalogCategory c WHERE c.idxLeft < :idxLeft AND c.idxRight > :idxRight ORDER BY c.idxLeft DESC" ) } )
 public class CatalogCategory {
 	@Id
@@ -64,7 +69,7 @@ public class CatalogCategory {
 
 	private String description = "";
 
-	@Column( name = "parent_id" )
+	@Column( name = "parent_id", updatable = false )
 	private int parentId;
 
 	@Column( name = "status_id", nullable = false )
@@ -79,15 +84,18 @@ public class CatalogCategory {
 	// @ManyToOne( fetch = FetchType.LAZY )
 	// private CatalogCategory parent;
 
-	@JsonIgnore
-	@OneToMany( fetch = FetchType.LAZY )
-	@JoinColumn( name = "parent_id" )
-	private List<CatalogCategory> children = new ArrayList<>();
+	// @JsonIgnore
+	// @OneToMany( fetch = FetchType.LAZY )
+	// @JoinColumn( name = "parent_id" )
+	// private List<CatalogCategory> children = new ArrayList<>();
 
 	@JsonIgnore
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
 	private List<CatalogItem> items = new ArrayList<>();
+
+	@Transient
+	private long level;
 
 	@PrePersist
 	public void prePersist() {
@@ -163,13 +171,13 @@ public class CatalogCategory {
 		this.items = items;
 	}
 
-	public List<CatalogCategory> getChildren() {
-		return children;
-	}
-
-	public void setChildren( List<CatalogCategory> children ) {
-		this.children = children;
-	}
+	// public List<CatalogCategory> getChildren() {
+	// return children;
+	// }
+	//
+	// public void setChildren( List<CatalogCategory> children ) {
+	// this.children = children;
+	// }
 
 	public String getMetaTitle() {
 		return metaTitle;
@@ -227,13 +235,23 @@ public class CatalogCategory {
 		this.uri = uri;
 	}
 
+	public long getLevel() {
+		return level;
+	}
+
+	public void setLevel( long level ) {
+		this.level = level;
+	}
+
 	@Override
 	public String toString() {
-		return "CatalogCategory [id=" + id + ", name=" + name + ", path=" + path + ", uri=" + uri + ", idxLeft="
-				+ idxLeft + ", idxRight=" + idxRight + ", created=" + created + ", modified=" + modified
-				+ ", metaTitle=" + metaTitle + ", metaKeywords=" + metaKeywords + ", metaDescription="
-				+ metaDescription + ", description=" + description + ", parentId=" + parentId + ", statusId="
-				+ statusId + "]";
+		return "CatalogCategory [id=" + id + ", name=" + name + ", path="
+				+ path + ", uri=" + uri + ", idxLeft=" + idxLeft
+				+ ", idxRight=" + idxRight + ", created=" + created
+				+ ", modified=" + modified + ", metaTitle=" + metaTitle
+				+ ", metaKeywords=" + metaKeywords + ", metaDescription="
+				+ metaDescription + ", description=" + description
+				+ ", parentId=" + parentId + ", statusId=" + statusId + "]";
 	}
 
 }
