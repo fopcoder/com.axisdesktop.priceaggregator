@@ -2,6 +2,7 @@ package com.axisdesktop.priceaggregator.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,14 +35,12 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Override
 	public List<CatalogCategory> listAsTree() {
-		return em.createNamedQuery( "CatalogCategory.listAsTree",
-				CatalogCategory.class ).getResultList();
+		return em.createNamedQuery( "CatalogCategory.listAsTree", CatalogCategory.class ).getResultList();
 	}
 
 	@Override
 	public List<CatalogCategory> listAsTreeWithLevel() {
-		List<Object[]> tmp = em.createNamedQuery(
-				"CatalogCategory.listAsTreeWithLevel", Object[].class )
+		List<Object[]> tmp = em.createNamedQuery( "CatalogCategory.listAsTreeWithLevel", Object[].class )
 				.getResultList();
 
 		List<CatalogCategory> res = new ArrayList<>();
@@ -76,11 +75,9 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 			this.composeUriPath( category, parent );
 
-			em.createQuery(
-					"UPDATE CatalogCategory SET idxLeft = idxLeft + 2 WHERE idxLeft > ?0" )
+			em.createQuery( "UPDATE CatalogCategory SET idxLeft = idxLeft + 2 WHERE idxLeft > ?0" )
 					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
-			em.createQuery(
-					"UPDATE CatalogCategory SET idxRight = idxRight + 2 WHERE idxRight > ?0" )
+			em.createQuery( "UPDATE CatalogCategory SET idxRight = idxRight + 2 WHERE idxRight > ?0" )
 					.setParameter( 0, parent.getIdxLeft() ).executeUpdate();
 
 			newCat = ссRepository.save( category );
@@ -116,16 +113,18 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 
 	@Override
 	public List<CatalogCategory> megamenu() {
-		TypedQuery<CatalogCategory> query = em.createNamedQuery(
-				"CatalogCategory.megamenu", CatalogCategory.class );
-		List<CatalogCategory> megamenu = query.getResultList();
+		List<CatalogCategory> res = em.createNamedQuery( "CatalogCategory.megamenu", CatalogCategory.class )
+				.getResultList();
+		// List<CatalogCategory> res = query.getResultList();
+
+		CatalogCategory megamenu = this._list2tree( res, res.remove( 0 ) );
 
 		// for( CatalogCategory cc : megamenu ) {
 		// System.out.println( cc.getName() + "======> "
 		// + cc.getChildren().size() );
 		// }
 
-		return megamenu;
+		return megamenu.getChildren();
 	}
 
 	@Override
@@ -133,11 +132,10 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 		CatalogCategory parent = null;
 
 		if( category != null ) {
-			TypedQuery<CatalogCategory> query = em.createNamedQuery(
-					"CatalogCategory.getParent", CatalogCategory.class );
+			TypedQuery<CatalogCategory> query = em
+					.createNamedQuery( "CatalogCategory.getParent", CatalogCategory.class );
 			parent = query.setParameter( "idxLeft", category.getIdxLeft() )
-					.setParameter( "idxRight", category.getIdxRight() )
-					.setMaxResults( 1 ).getSingleResult();
+					.setParameter( "idxRight", category.getIdxRight() ).setMaxResults( 1 ).getSingleResult();
 		}
 
 		return parent;
@@ -171,5 +169,26 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 				category.setPath( "" );
 			}
 		}
+	}
+
+	private CatalogCategory _list2tree( List<CatalogCategory> list, CatalogCategory cat ) {
+		CatalogCategory catNew = new CatalogCategory( cat );
+
+		for( ListIterator<CatalogCategory> it = list.listIterator(); it.hasNext(); ) {
+			CatalogCategory cc = it.next();
+
+			if( cc == null || cc.getIdxLeft() < catNew.getIdxLeft() || cc.getIdxRight() > catNew.getIdxRight() ) continue;
+
+			it.set( null );
+
+			if( cc.getIdxRight() - cc.getIdxLeft() == 1 ) {
+				catNew.getChildren().add( new CatalogCategory( cc ) );
+			}
+			else {
+				catNew.getChildren().add( this._list2tree( list, cc ) );
+			}
+		}
+
+		return catNew;
 	}
 }

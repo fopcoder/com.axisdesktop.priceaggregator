@@ -14,7 +14,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -75,20 +74,6 @@ public class CatalogCategory {
 	@Column( name = "status_id", nullable = false )
 	private int statusId;
 
-	// @JsonIgnore
-	// @ManyToOne( optional = false, fetch = FetchType.LAZY )
-	// @JoinColumn( name = "status_id" )
-	// private CatalogCategoryStatus status;
-
-	// @JoinColumn( name = "parent_id" )
-	// @ManyToOne( fetch = FetchType.LAZY )
-	// private CatalogCategory parent;
-
-	// @JsonIgnore
-	// @OneToMany( fetch = FetchType.LAZY )
-	// @JoinColumn( name = "parent_id" )
-	// private List<CatalogCategory> children = new ArrayList<>();
-
 	@JsonIgnore
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
@@ -97,7 +82,31 @@ public class CatalogCategory {
 	@Transient
 	private long level;
 
-	@PrePersist
+	@Transient
+	private List<CatalogCategory> children = new ArrayList<>();
+
+	public CatalogCategory() {
+	}
+
+	public CatalogCategory( CatalogCategory cat ) {
+		this.id = cat.getId();
+		this.name = cat.getName();
+		this.path = cat.getPath();
+		this.uri = cat.getUri();
+		this.idxLeft = cat.getIdxLeft();
+		this.idxRight = cat.getIdxRight();
+		this.created = cat.getCreated();
+		this.modified = cat.getModified();
+		this.metaTitle = cat.getMetaTitle();
+		this.metaKeywords = cat.getMetaKeywords();
+		this.metaDescription = cat.getMetaDescription();
+		this.description = cat.getDescription();
+		this.parentId = cat.getParentId();
+		this.statusId = cat.getStatusId();
+		this.items = cat.getItems();
+		this.level = cat.getLevel();
+	}
+
 	public void prePersist() {
 		this.created = this.modified = Calendar.getInstance();
 	}
@@ -243,15 +252,17 @@ public class CatalogCategory {
 		this.level = level;
 	}
 
+	public List<CatalogCategory> getChildren() {
+		return children;
+	}
+
 	@Override
 	public String toString() {
-		return "CatalogCategory [id=" + id + ", name=" + name + ", path="
-				+ path + ", uri=" + uri + ", idxLeft=" + idxLeft
-				+ ", idxRight=" + idxRight + ", created=" + created
-				+ ", modified=" + modified + ", metaTitle=" + metaTitle
-				+ ", metaKeywords=" + metaKeywords + ", metaDescription="
-				+ metaDescription + ", description=" + description
-				+ ", parentId=" + parentId + ", statusId=" + statusId + "]";
+		return "CatalogCategory [id=" + id + ", name=" + name + ", path=" + path + ", uri=" + uri + ", idxLeft="
+				+ idxLeft + ", idxRight=" + idxRight + ", created=" + created + ", modified=" + modified
+				+ ", metaTitle=" + metaTitle + ", metaKeywords=" + metaKeywords + ", metaDescription="
+				+ metaDescription + ", description=" + description + ", parentId=" + parentId + ", statusId="
+				+ statusId + "]";
 	}
 
 }
