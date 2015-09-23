@@ -17,6 +17,8 @@ appCtrl.controller('Category', [ '$scope', '$http', function($scope, $http) {
 	}, function(response) {
 		alert('network/server error');
 	});
+	
+	//$scope.delete
 } ]);
 
 appCtrl.controller('CategoryEdit', [

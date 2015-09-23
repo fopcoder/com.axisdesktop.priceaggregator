@@ -59,6 +59,7 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 	}
 
 	@Override
+	@Transactional
 	public CatalogCategory create( CatalogCategory category ) {
 		return this.prependCategory( category );
 	}
@@ -105,7 +106,16 @@ public class CatalogCategoryServiceImpl implements CatalogCategoryService {
 		CatalogCategory category = ссRepository.findOne( id );
 
 		if( category != null ) {
-			ссRepository.delete( category );
+			int left = category.getIdxLeft();
+			int right = category.getIdxRight();
+			int width = right - left + 1;
+
+			em.createQuery( "DELETE FROM CatalogCategory WHERE idxLeft BETWEEN ?0 AND ?1" ).setParameter( 0, left )
+					.setParameter( 1, right ).executeUpdate();
+			em.createQuery( "UPDATE CatalogCategory SET idxRight = idxRight - ?0 WHERE idxRight > ?1" )
+					.setParameter( 0, width ).setParameter( 1, right ).executeUpdate();
+			em.createQuery( "UPDATE CatalogCategory SET idxLeft = idxLeft - ?0 WHERE idxLeft > ?1" )
+					.setParameter( 0, width ).setParameter( 1, right ).executeUpdate();
 		}
 
 		return null;

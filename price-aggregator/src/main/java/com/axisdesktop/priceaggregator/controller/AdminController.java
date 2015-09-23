@@ -29,9 +29,9 @@ public class AdminController {
 	@RequestMapping
 	public String index( Model model ) {
 
-		model.addAttribute( "providers", providerService.list() );
+		// model.addAttribute( "providers", providerService.list() );
 		// model.addAttribute( "categories", catalogCategoryService.list() );
-		model.addAttribute( "currencies", currencyService.list() );
+		// model.addAttribute( "currencies", currencyService.list() );
 
 		return "admin/index";
 	}

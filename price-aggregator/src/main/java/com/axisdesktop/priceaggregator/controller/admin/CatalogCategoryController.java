@@ -48,13 +48,11 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory cat = ccService.getById( id );
-			if( cat == null ) throw new NoSuchEntityException( "Category id = "
-					+ id + " does not exists" );
+			if( cat == null ) throw new NoSuchEntityException( "Category id = " + id + " does not exists" );
 
 			CatalogCategory parent = ccService.getParentCategory( cat );
-			if( parent == null ) throw new NoSuchEntityException(
-					"Category parent id = " + cat.getParentId()
-							+ " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException( "Category parent for id = " + cat.getId()
+					+ " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", cat );
@@ -82,11 +80,9 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory old = ccService.getById( category.getId() );
-			if( old == null ) throw new NoSuchEntityException( "Category id = "
-					+ category.getId() + " does not exists" );
+			if( old == null ) throw new NoSuchEntityException( "Category id = " + category.getId() + " does not exists" );
 
-			BeanUtils.copyProperties( category, old, new String[] { "parentId",
-					"idxLeft", "idxRight" } );
+			BeanUtils.copyProperties( category, old, new String[] { "parentId", "idxLeft", "idxRight" } );
 
 			ccService.update( old );
 
@@ -116,8 +112,7 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory parent = ccService.getById( parentId );
-			if( parent == null ) throw new NoSuchEntityException(
-					"Category id = " + parentId + " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException( "Category id = " + parentId + " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", new CatalogCategory() );
@@ -140,8 +135,7 @@ public class CatalogCategoryController {
 	}
 
 	@RequestMapping( value = "/create", method = RequestMethod.POST )
-	public Map<String, Object> createCategory(
-			@RequestBody CatalogCategory category ) {
+	public Map<String, Object> createCategory( @RequestBody CatalogCategory category ) {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
@@ -161,11 +155,23 @@ public class CatalogCategoryController {
 		return res;
 	}
 
-	@RequestMapping( value = "/category/delete/{categoryId}" )
-	public String deleteCategory( @PathVariable int categoryId ) {
-		ccService.delete( categoryId );
+	@RequestMapping( value = "/delete/{id}" )
+	public Map<String, Object> deleteCategory( @PathVariable int id ) {
+		Map<String, Object> res = new HashMap<>();
 
-		return "redirect:/admin";
+		try {
+			ccService.delete( id );
+			res.put( "success", true );
+		}
+		catch( Exception e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
+
+			System.err.println( "===> unknown exception" );
+			e.printStackTrace();
+		}
+
+		return res;
 	}
 
 }

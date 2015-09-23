@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -68,9 +69,6 @@ public class CatalogCategory {
 
 	private String description = "";
 
-	@Column( name = "parent_id", updatable = false )
-	private int parentId;
-
 	@Column( name = "status_id", nullable = false )
 	private int statusId;
 
@@ -78,6 +76,9 @@ public class CatalogCategory {
 	@ManyToMany( fetch = FetchType.LAZY )
 	@JoinTable( name = "catalog_category_item", joinColumns = { @JoinColumn( name = "category_id", referencedColumnName = "id" ) }, inverseJoinColumns = { @JoinColumn( name = "item_id", referencedColumnName = "id" ) } )
 	private List<CatalogItem> items = new ArrayList<>();
+
+	@Transient
+	private int parentId;
 
 	@Transient
 	private long level;
@@ -107,6 +108,7 @@ public class CatalogCategory {
 		this.level = cat.getLevel();
 	}
 
+	@PrePersist
 	public void prePersist() {
 		this.created = this.modified = Calendar.getInstance();
 	}
