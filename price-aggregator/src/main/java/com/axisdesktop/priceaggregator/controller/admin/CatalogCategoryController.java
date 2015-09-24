@@ -48,11 +48,13 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory cat = ccService.getById( id );
-			if( cat == null ) throw new NoSuchEntityException( "Category id = " + id + " does not exists" );
+			if( cat == null ) throw new NoSuchEntityException( "Category id = "
+					+ id + " does not exists" );
 
 			CatalogCategory parent = ccService.getParentCategory( cat );
-			if( parent == null ) throw new NoSuchEntityException( "Category parent for id = " + cat.getId()
-					+ " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException(
+					"Category parent for id = " + cat.getId()
+							+ " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", cat );
@@ -80,9 +82,11 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory old = ccService.getById( category.getId() );
-			if( old == null ) throw new NoSuchEntityException( "Category id = " + category.getId() + " does not exists" );
+			if( old == null ) throw new NoSuchEntityException( "Category id = "
+					+ category.getId() + " does not exists" );
 
-			BeanUtils.copyProperties( category, old, new String[] { "parentId", "idxLeft", "idxRight" } );
+			BeanUtils.copyProperties( category, old, new String[] { "parentId",
+					"idxLeft", "idxRight" } );
 
 			ccService.update( old );
 
@@ -112,7 +116,8 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory parent = ccService.getById( parentId );
-			if( parent == null ) throw new NoSuchEntityException( "Category id = " + parentId + " does not exists" );
+			if( parent == null ) throw new NoSuchEntityException(
+					"Category id = " + parentId + " does not exists" );
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", new CatalogCategory() );
@@ -135,7 +140,8 @@ public class CatalogCategoryController {
 	}
 
 	@RequestMapping( value = "/create", method = RequestMethod.POST )
-	public Map<String, Object> createCategory( @RequestBody CatalogCategory category ) {
+	public Map<String, Object> createCategory(
+			@RequestBody CatalogCategory category ) {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
@@ -155,13 +161,26 @@ public class CatalogCategoryController {
 		return res;
 	}
 
-	@RequestMapping( value = "/delete/{id}" )
+	@RequestMapping( value = "/delete/{id}", method = RequestMethod.DELETE )
 	public Map<String, Object> deleteCategory( @PathVariable int id ) {
 		Map<String, Object> res = new HashMap<>();
 
 		try {
+			CatalogCategory cat = ccService.getById( id );
+
+			if( cat == null ) throw new IllegalArgumentException(
+					"category id=" + id + " not found" );
+
+			if( cat.getIdxLeft() == 1 ) throw new IllegalArgumentException(
+					"cannot remove root category" );
+
 			ccService.delete( id );
 			res.put( "success", true );
+			res.put( "categories", ccService.listAsTreeWithLevel() );
+		}
+		catch( IllegalArgumentException e ) {
+			res.put( "success", false );
+			res.put( "message", e.getMessage() );
 		}
 		catch( Exception e ) {
 			res.put( "success", false );

@@ -13,11 +13,11 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
-@Profile( "production" )
+@Profile( "development" )
 @Configuration
 @EnableWebMvc
 @ComponentScan( "com.axisdesktop.priceaggregator.controller" )
-public class MvcConfig extends WebMvcConfigurerAdapter {
+public class MvcDevConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public TemplateResolver templateResolver() {
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
@@ -48,6 +48,14 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addResourceHandlers( ResourceHandlerRegistry registry ) {
+
+		System.out.println( "============================" );
+		System.out.println( System.getProperty( "jboss.server.temp.dir" ) );
+		System.out.println( System.getProperty( "java.io.tmpdir" ) );
+
+		// <mvc:resources mapping="/images/**"
+		// location="file:/absolute/path/to/image/dir/"/>
+
 		registry.addResourceHandler( "/resources/**" ).addResourceLocations(
 				"/resources/" );
 	}

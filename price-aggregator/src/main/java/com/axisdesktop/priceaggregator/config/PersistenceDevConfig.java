@@ -34,12 +34,11 @@ public class PersistenceDevConfig {
 	@Bean
 	public DataSource dataSource() {
 		// localhost:8082 jdbc:h2:mem:testdb
-		System.out.println( "============================" );
-		System.out.println( System.getProperty( "jboss.server.temp.dir" ) );
 
 		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-		EmbeddedDatabase db = builder.setType( EmbeddedDatabaseType.H2 ).addScript( "sql/schema.sql" )
-				.addScript( "sql/data.sql" ).setName( "testdb" ).build();
+		EmbeddedDatabase db = builder.setType( EmbeddedDatabaseType.H2 )
+				.addScript( "sql/schema.sql" ).addScript( "sql/data.sql" )
+				.setName( "testdb" ).build();
 		return db;
 	}
 
@@ -53,7 +52,8 @@ public class PersistenceDevConfig {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setGenerateDdl( Boolean.FALSE );
 		vendorAdapter.setShowSql( Boolean.TRUE );
-		vendorAdapter.setDatabasePlatform( "org.hibernate.dialect.MySQL5Dialect" );
+		vendorAdapter
+				.setDatabasePlatform( "org.hibernate.dialect.MySQL5Dialect" );
 		vendorAdapter.setDatabase( Database.MYSQL );
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
@@ -62,7 +62,8 @@ public class PersistenceDevConfig {
 		factory.setDataSource( dataSource() );
 
 		Properties jpaProperties = new Properties();
-		jpaProperties.put( "hibernate.format_sql", environment.getProperty( "hibernate.format_sql" ) );
+		jpaProperties.put( "hibernate.format_sql",
+				environment.getProperty( "hibernate.format_sql" ) );
 		factory.setJpaProperties( jpaProperties );
 		factory.afterPropertiesSet();
 
@@ -72,7 +73,8 @@ public class PersistenceDevConfig {
 	@Bean
 	public JpaTransactionManager transactionManager() {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
-		transactionManager.setEntityManagerFactory( entityManagerFactory().getObject() );
+		transactionManager.setEntityManagerFactory( entityManagerFactory()
+				.getObject() );
 		transactionManager.setJpaDialect( new HibernateJpaDialect() );
 		return transactionManager;
 	}

@@ -7,7 +7,7 @@ appCtrl.controller('Index', [ '$scope', function($scope) {
 } ]);
 
 appCtrl.controller('Category', [ '$scope', '$http', function($scope, $http) {
-	$http.get("/price-aggregator/admin/category").then(function(response) {
+	$http.get( ctxPath + '/admin/category').then(function(response) {
 		if (response.data.success) {
 			$scope.categories = response.data.categories;
 		} else {
@@ -18,7 +18,19 @@ appCtrl.controller('Category', [ '$scope', '$http', function($scope, $http) {
 		alert('network/server error');
 	});
 	
-	//$scope.delete
+	$scope.delete = function( id )	{
+		$http.delete(ctxPath + '/admin/category/delete/' + id )
+		.then(function(response) {
+			if (response.data.success) {
+				$scope.categories = response.data.categories;
+				alert("удалено");
+			} else {
+				alert(response.data.message);
+			}
+		}, function(response) {
+			alert('network/server error');
+		});
+	}
 } ]);
 
 appCtrl.controller('CategoryEdit', [
@@ -79,8 +91,7 @@ appCtrl.controller('CategoryNew', [
 					})
 					
 			$scope.create = function() {
-				console.log($scope.category);
-
+				
 				$http.post(ctxPath + '/admin/category/create', $scope.category)
 						.then(function(response) {
 							if (response.data.success) {

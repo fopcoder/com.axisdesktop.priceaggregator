@@ -21,10 +21,10 @@ import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@Profile( "production" )
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories( "com.axisdesktop.priceaggregator.repository" )
-@Profile( "production" )
 public class PersistenceConfig {
 	@Autowired
 	private Environment environment;
@@ -47,7 +47,8 @@ public class PersistenceConfig {
 		}
 		else {
 			DriverManagerDataSource ds = new DriverManagerDataSource();
-			ds.setDriverClassName( environment.getRequiredProperty( "db.driver" ) );
+			ds.setDriverClassName( environment
+					.getRequiredProperty( "db.driver" ) );
 			ds.setUrl( environment.getRequiredProperty( "db.url" ) );
 			ds.setUsername( environment.getRequiredProperty( "db.username" ) );
 			ds.setPassword( environment.getRequiredProperty( "db.password" ) );
@@ -63,7 +64,8 @@ public class PersistenceConfig {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setGenerateDdl( Boolean.FALSE );
 		vendorAdapter.setShowSql( Boolean.TRUE );
-		vendorAdapter.setDatabasePlatform( "org.hibernate.dialect.MySQLDialect" );
+		vendorAdapter
+				.setDatabasePlatform( "org.hibernate.dialect.MySQLDialect" );
 		vendorAdapter.setDatabase( Database.MYSQL );
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
@@ -75,7 +77,8 @@ public class PersistenceConfig {
 		// jpaProperties.put( "hibernate.connection.zeroDateTimeBehavior",
 		// environment.getProperty( "hibernate.connection.zeroDateTimeBehavior"
 		// ) );
-		jpaProperties.put( "hibernate.format_sql", environment.getProperty( "hibernate.format_sql" ) );
+		jpaProperties.put( "hibernate.format_sql",
+				environment.getProperty( "hibernate.format_sql" ) );
 		// jpaProperties.put( "hibernate.connection.charSet",
 		// environment.getProperty( "hibernate.connection.charSet" ) );
 
@@ -93,7 +96,8 @@ public class PersistenceConfig {
 	@Bean
 	public JpaTransactionManager transactionManager() {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
-		transactionManager.setEntityManagerFactory( entityManagerFactory().getObject() );
+		transactionManager.setEntityManagerFactory( entityManagerFactory()
+				.getObject() );
 		transactionManager.setJpaDialect( new HibernateJpaDialect() );
 		return transactionManager;
 	}
