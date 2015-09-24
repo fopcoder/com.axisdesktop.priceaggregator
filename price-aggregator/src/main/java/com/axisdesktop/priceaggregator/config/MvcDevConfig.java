@@ -1,5 +1,9 @@
 package com.axisdesktop.priceaggregator.config;
 
+import java.io.File;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +22,9 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 @EnableWebMvc
 @ComponentScan( "com.axisdesktop.priceaggregator.controller" )
 public class MvcDevConfig extends WebMvcConfigurerAdapter {
+	@Autowired
+	private ApplicationContext ctx;
+
 	@Bean
 	public TemplateResolver templateResolver() {
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
@@ -48,16 +55,36 @@ public class MvcDevConfig extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addResourceHandlers( ResourceHandlerRegistry registry ) {
+		String path = System.getProperty( "jboss.server.temp.dir" );
+		String imgPath;
+		String filePath;
 
-		System.out.println( "============================" );
+		if( path.isEmpty() ) {
+			path = System.getProperty( "java.io.tmpdir" );
+		}
+
+		path = path + ctx.getApplicationName() + "/static";
+		imgPath = path + "/img/";
+		filePath = path + "/file";
+
+		new File( path ).mkdirs();
+		new File( imgPath ).mkdirs();
+		new File( filePath ).mkdirs();
+
+		System.out.println( "============================ " + ctx.getApplicationName() );
 		System.out.println( System.getProperty( "jboss.server.temp.dir" ) );
 		System.out.println( System.getProperty( "java.io.tmpdir" ) );
 
 		// <mvc:resources mapping="/images/**"
 		// location="file:/absolute/path/to/image/dir/"/>
+		System.out.println( "file:/" + imgPath );
 
-		registry.addResourceHandler( "/resources/**" ).addResourceLocations(
-				"/resources/" );
+		registry.addResourceHandler( "/resources/**" ).addResourceLocations( "/resources/" );
+		// registry.addResourceHandler( "/img/**" ).addResourceLocations( imgstr
+		// );
+
+		// "file:/C:\\Users\\coder\\Downloads\\dev-wildfly-8.2.0.Final\\standalone\\tmp\\price-aggregator\\static\\img\\"
+
+		registry.addResourceHandler( "/img/**" ).addResourceLocations( "file:/" + imgPath );
 	}
-
 }
