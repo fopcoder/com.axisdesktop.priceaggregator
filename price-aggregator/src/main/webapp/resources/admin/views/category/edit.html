@@ -2,13 +2,14 @@
 <h1 class="page-header" data-ng-bind-template="Категория: {{category.name}}"></h1>
 
 <div class="row">
-<form role="form" name="form" class="form-horizontal" novalidate="true" data-ng-submit="update()">
+<form role="form" name="form" class="form-horizontal" novalidate="true" data-ng-submit="update()" enctype="multipart/form-data">
 	<div class="form-group">
 		<div class="col-sm-2">
 		<button type="submit" class="btn btn-default" >Сохранить <span class="glyphicon glyphicon-save"></span></button>
 		</div>
 	</div>
-	<fieldset class="col-sm-6">
+	<div class="col-sm-6">
+	<fieldset>
 		<legend>Основные</legend>
 		
 		<div class="form-group">
@@ -79,7 +80,9 @@
 			</div>
 		</div>
 	</fieldset>
-	<fieldset class="col-sm-6">
+	</div>
+	<div  class="col-sm-6">
+	<fieldset>
 		<legend>Мета</legend>
 		
 		<div class="form-group">
@@ -101,5 +104,16 @@
 			</div>
 		</div>
 	</fieldset>
+	<fieldset>
+		<legend>Картинки</legend>
+		
+		<div class="from-group">
+			<label class="col-sm-2" for="image">Файл:</label>
+			<div class="col-sm-10">
+				<input type="file" name="image" id="image" file-model="image">
+			</div>
+		</div>
+	</fieldset>
+	</div>
 </form>
 </div>

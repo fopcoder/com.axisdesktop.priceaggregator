@@ -1,5 +1,11 @@
 package com.axisdesktop.priceaggregator.config;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,8 +52,42 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		return viewResolver;
 	}
 
+	@Bean
+	public Path staticDir() {
+		// TODO set path in application.properties or somehow else
+		return Paths.get( "/var/www/virtual/price_aggregator/static" );
+	}
+
+	@Bean
+	public Path imgDir() {
+		return staticDir().resolve( "img" );
+	}
+
+	@Bean
+	public Path fileDir() {
+		return staticDir().resolve( "file" );
+	}
+
 	@Override
 	public void addResourceHandlers( ResourceHandlerRegistry registry ) {
+		Path imgDir = imgDir();
+		Path fileDir = fileDir();
+
+		try {
+			Files.createDirectories( imgDir );
+			Files.createDirectories( fileDir );
+
+			registry.addResourceHandler( "/img/**" ).addResourceLocations(
+					"file:/" + imgDir.toString()
+							+ FileSystems.getDefault().getSeparator() );
+			registry.addResourceHandler( "/file/**" ).addResourceLocations(
+					"file:/" + fileDir.toString()
+							+ FileSystems.getDefault().getSeparator() );
+		}
+		catch( IOException e ) {
+			e.printStackTrace();
+		}
+
 		registry.addResourceHandler( "/resources/**" ).addResourceLocations(
 				"/resources/" );
 	}

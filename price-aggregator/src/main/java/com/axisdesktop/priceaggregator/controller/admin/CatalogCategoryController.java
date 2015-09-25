@@ -48,13 +48,19 @@ public class CatalogCategoryController {
 
 		try {
 			CatalogCategory cat = ccService.getById( id );
+
 			if( cat == null ) throw new NoSuchEntityException( "Category id = "
 					+ id + " does not exists" );
 
-			CatalogCategory parent = ccService.getParentCategory( cat );
-			if( parent == null ) throw new NoSuchEntityException(
-					"Category parent for id = " + cat.getId()
-							+ " does not exists" );
+			CatalogCategory parent = null;
+
+			if( cat.getIdxLeft() > 1 ) {
+				parent = ccService.getParentCategory( cat );
+
+				if( parent == null ) throw new NoSuchEntityException(
+						"Category parent for id = " + cat.getId()
+								+ " does not exists" );
+			}
 
 			res.put( "statuses", ccStatusService.list() );
 			res.put( "category", cat );

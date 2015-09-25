@@ -1,6 +1,10 @@
 package com.axisdesktop.priceaggregator.config;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -23,7 +27,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 @ComponentScan( "com.axisdesktop.priceaggregator.controller" )
 public class MvcDevConfig extends WebMvcConfigurerAdapter {
 	@Autowired
-	private ApplicationContext ctx;
+	private ApplicationContext appCtx;
 
 	@Bean
 	public TemplateResolver templateResolver() {
@@ -53,38 +57,50 @@ public class MvcDevConfig extends WebMvcConfigurerAdapter {
 		return viewResolver;
 	}
 
-	@Override
-	public void addResourceHandlers( ResourceHandlerRegistry registry ) {
+	@Bean
+	public Path staticDir() {
 		String path = System.getProperty( "jboss.server.temp.dir" );
-		String imgPath;
-		String filePath;
 
 		if( path.isEmpty() ) {
 			path = System.getProperty( "java.io.tmpdir" );
 		}
 
-		path = path + ctx.getApplicationName() + "/static";
-		imgPath = path + "/img/";
-		filePath = path + "/file";
+		Path staticDir = Paths
+				.get( path, appCtx.getApplicationName(), "static" );
+		return staticDir;
+	}
 
-		new File( path ).mkdirs();
-		new File( imgPath ).mkdirs();
-		new File( filePath ).mkdirs();
+	@Bean
+	public Path imgDir() {
+		return staticDir().resolve( "img" );
+	}
 
-		System.out.println( "============================ " + ctx.getApplicationName() );
-		System.out.println( System.getProperty( "jboss.server.temp.dir" ) );
-		System.out.println( System.getProperty( "java.io.tmpdir" ) );
+	@Bean
+	public Path fileDir() {
+		return staticDir().resolve( "file" );
+	}
 
-		// <mvc:resources mapping="/images/**"
-		// location="file:/absolute/path/to/image/dir/"/>
-		System.out.println( "file:/" + imgPath );
+	@Override
+	public void addResourceHandlers( ResourceHandlerRegistry registry ) {
+		Path imgDir = imgDir();
+		Path fileDir = fileDir();
 
-		registry.addResourceHandler( "/resources/**" ).addResourceLocations( "/resources/" );
-		// registry.addResourceHandler( "/img/**" ).addResourceLocations( imgstr
-		// );
+		try {
+			Files.createDirectories( imgDir );
+			Files.createDirectories( fileDir );
 
-		// "file:/C:\\Users\\coder\\Downloads\\dev-wildfly-8.2.0.Final\\standalone\\tmp\\price-aggregator\\static\\img\\"
+			registry.addResourceHandler( "/img/**" ).addResourceLocations(
+					"file:/" + imgDir.toString()
+							+ FileSystems.getDefault().getSeparator() );
+			registry.addResourceHandler( "/file/**" ).addResourceLocations(
+					"file:/" + fileDir.toString()
+							+ FileSystems.getDefault().getSeparator() );
+		}
+		catch( IOException e ) {
+			e.printStackTrace();
+		}
 
-		registry.addResourceHandler( "/img/**" ).addResourceLocations( "file:/" + imgPath );
+		registry.addResourceHandler( "/resources/**" ).addResourceLocations(
+				"/resources/" );
 	}
 }

@@ -2,6 +2,22 @@ var appCtrl = angular.module('appCtrl', []);
 
 var ctxPath = '/price-aggregator';
 
+appCtrl.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+            
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]);
+
 appCtrl.controller('Index', [ '$scope', function($scope) {
 	$scope.message = "admin index dashboard";
 } ]);
@@ -44,6 +60,7 @@ appCtrl.controller('CategoryEdit', [
 							$scope.category = response.data.category;
 							$scope.parent = response.data.parent;
 							$scope.statuses = response.data.statuses;
+							$scope.image = null;
 						} else {
 							$scope.category = {};
 							alert(response.data.message);
@@ -53,7 +70,12 @@ appCtrl.controller('CategoryEdit', [
 					});
 
 			$scope.update = function() {
-				$http.post(ctxPath + '/admin/category/update', $scope.category)
+				var formData = new FormData();
+		        formData.append("image",$scope.image);
+		        formData.append("category",$scope.category);
+				console.log(formData);
+				
+				$http.post(ctxPath + '/admin/category/update', formData, { headers: {'Content-Type': undefined} })
 						.then(function(response) {
 							if (response.data.success) {
 								$scope.category = response.data.category;
