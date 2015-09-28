@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -65,8 +66,7 @@ public class MvcDevConfig extends WebMvcConfigurerAdapter {
 			path = System.getProperty( "java.io.tmpdir" );
 		}
 
-		Path staticDir = Paths
-				.get( path, appCtx.getApplicationName(), "static" );
+		Path staticDir = Paths.get( path, appCtx.getApplicationName(), "static" );
 		return staticDir;
 	}
 
@@ -90,17 +90,21 @@ public class MvcDevConfig extends WebMvcConfigurerAdapter {
 			Files.createDirectories( fileDir );
 
 			registry.addResourceHandler( "/img/**" ).addResourceLocations(
-					"file:/" + imgDir.toString()
-							+ FileSystems.getDefault().getSeparator() );
+					"file:/" + imgDir.toString() + FileSystems.getDefault().getSeparator() );
 			registry.addResourceHandler( "/file/**" ).addResourceLocations(
-					"file:/" + fileDir.toString()
-							+ FileSystems.getDefault().getSeparator() );
+					"file:/" + fileDir.toString() + FileSystems.getDefault().getSeparator() );
 		}
 		catch( IOException e ) {
 			e.printStackTrace();
 		}
 
-		registry.addResourceHandler( "/resources/**" ).addResourceLocations(
-				"/resources/" );
+		registry.addResourceHandler( "/resources/**" ).addResourceLocations( "/resources/" );
+	}
+
+	@Bean
+	public CommonsMultipartResolver multipartResolver() {
+		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+		resolver.setDefaultEncoding( "utf-8" );
+		return resolver;
 	}
 }

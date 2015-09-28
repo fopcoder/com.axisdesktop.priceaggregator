@@ -70,16 +70,33 @@ appCtrl.controller('CategoryEdit', [
 					});
 
 			$scope.update = function() {
-				var formData = new FormData();
-		        formData.append("image",$scope.image);
-		        formData.append("category",$scope.category);
-				console.log(formData);
-				
-				$http.post(ctxPath + '/admin/category/update', formData, { headers: {'Content-Type': undefined} })
+			
+				$http.post(ctxPath + '/admin/category/update', $scope.category )
 						.then(function(response) {
 							if (response.data.success) {
 								$scope.category = response.data.category;
+								
+								// TODO сделать нормальные бублы
 								alert("сохранено");
+								
+								// TODO сделать одним посылом	
+								var formData = new FormData();
+						        formData.append("image",$scope.image);
+						        formData.append("categoryId",$scope.category.id)
+						        
+								$http.post(ctxPath + '/admin/category/add/image', formData, { headers: {'Content-Type': undefined} })
+								.then( function(response) {
+										if (response.data.success) {
+											alert("картика сохранена");
+										}
+										else	{
+											alert(response.data.message);
+										}
+									},
+									function( response){
+										alert('network/server error');
+									}
+								)
 							} else {
 								$scope.category = {};
 								alert(response.data.message);
